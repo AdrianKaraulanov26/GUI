@@ -1,0 +1,90 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Main {
+    public static void main(String[] args) {
+
+        JFrame frame = new JFrame("Guessing game with UI");
+        frame.setSize(800, 800);
+        frame.setLayout(new GridLayout(5, 1));
+
+        JLabel intro = new JLabel("Welcome to the guessing game! Enter a number and I'll tell you.");
+        JLabel introV1 = new JLabel("whether it is higher or lower compared to the one I have in mind.");
+        JLabel introV2 = new JLabel("You can give up if you type 'I am a quitter'. BTW you have 10 guesses :)");
+        intro.setFont(new Font("Oswald", Font.PLAIN, 20));
+        intro.setBackground(Color.BLACK);
+        frame.add(intro);
+        introV1.setFont(new Font("Oswald", Font.PLAIN, 20));
+        introV1.setBackground(Color.BLACK);
+        frame.add(introV1);
+        introV2.setFont(new Font("Oswald", Font.PLAIN, 20));
+        introV2.setBackground(Color.BLACK);
+        frame.add(introV2);
+
+        JTextField userTry = new JTextField("0", 10);
+        userTry.setFont(new Font("Oswald", Font.PLAIN, 40));
+        userTry.setSize(100, 40);
+
+        JPanel interactive = new JPanel(new FlowLayout());
+        JButton check = new JButton("Check");
+        interactive.add(check);
+        Layoutset(check);
+        interactive.add(userTry);
+
+        frame.add(interactive);
+
+
+        JLabel output = new JLabel("Feedback");
+        output.setFont(new Font("Oswald", Font.PLAIN, 40));
+        output.setBackground(Color.WHITE);
+        frame.add(output);
+
+        frame.setVisible(true);
+        int price = (int) Math.floor(Math.random() * 100);
+        int attempts = 0;
+        boolean play = true;
+        while (play) {
+            check.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    int attempt = Integer.parseInt(userTry.getText());
+                    if (attempt == price) {
+                    System.out.println("Congratulations, you won!");
+                    System.out.println("The number of guesses it took you was " + attempts);
+                    play = false;
+                } else if (attempt == 100 - price || 100 - attempt == price) {
+                    
+                } else if (attempt < price && price - attempt < 20) {
+                        output.setText("Guess higher, you are very close.");
+                } else if (attempt > price && attempt - price < 20) {
+                    output.setText("Guess lower, you are very close.");
+                } else if (attempt < price && price - attempt > 20) {
+                    output.setText("Guess higher, you aren't even close.");
+                } else if (attempt > price && attempt - price > 20) {
+                    output.setText("Guess lower, you aren't even close.");
+                }
+                if(attempts == 5  && play != false){
+                    System.out.println("Ok you better make it soon");
+                }
+                if (attempts == 9  && play != false) {
+                    System.out.println("You have one attempt left, don't waste it");
+                }
+                if (attempts > 9 && play != false) {
+                    play = false;
+                    System.out.println("The correct number was " + price);
+                    System.out.println("Good luck next time!");
+                }
+   }
+            });
+        }
+    }
+
+    public static void Layoutset(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 40));
+        button.setForeground(Color.BLACK);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+    }
+}
