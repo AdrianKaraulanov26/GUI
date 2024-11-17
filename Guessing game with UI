@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 public class Main {
     public static void main(String[] args) {
-
         JFrame frame = new JFrame("Guessing game with UI");
         frame.setSize(800, 800);
         frame.setLayout(new GridLayout(5, 1));
@@ -35,7 +34,6 @@ public class Main {
 
         frame.add(interactive);
 
-
         JLabel output = new JLabel("Feedback");
         output.setFont(new Font("Oswald", Font.PLAIN, 40));
         output.setBackground(Color.WHITE);
@@ -43,41 +41,45 @@ public class Main {
 
         frame.setVisible(true);
         int price = (int) Math.floor(Math.random() * 100);
-        int attempts = 0;
-        boolean play = true;
-        while (play) {
-            check.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    int attempt = Integer.parseInt(userTry.getText());
+        final int[] attempts = {0}; // Using an array for mutability in inner class
+
+        check.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String input = userTry.getText();
+                if (input.equalsIgnoreCase("I am a quitter")) {
+                    output.setText("You quit! The correct number was " + price);
+                    return;
+                }
+
+                try {
+                    int attempt = Integer.parseInt(input);
+                    attempts[0]++;
                     if (attempt == price) {
-                    System.out.println("Congratulations, you won!");
-                    System.out.println("The number of guesses it took you was " + attempts);
-                    play = false;
-                } else if (attempt == 100 - price || 100 - attempt == price) {
-                    
-                } else if (attempt < price && price - attempt < 20) {
+                        output.setText("Congratulations, you won in " + attempts[0] + " guesses!");
+                    } else if (attempt < price && price - attempt < 20) {
                         output.setText("Guess higher, you are very close.");
-                } else if (attempt > price && attempt - price < 20) {
-                    output.setText("Guess lower, you are very close.");
-                } else if (attempt < price && price - attempt > 20) {
-                    output.setText("Guess higher, you aren't even close.");
-                } else if (attempt > price && attempt - price > 20) {
-                    output.setText("Guess lower, you aren't even close.");
+                    } else if (attempt > price && attempt - price < 20) {
+                        output.setText("Guess lower, you are very close.");
+                    } else if (attempt < price && price - attempt >= 20) {
+                        output.setText("Guess higher, you aren't even close.");
+                    } else if (attempt > price && attempt - price >= 20) {
+                        output.setText("Guess lower, you aren't even close.");
+                    }
+
+                    if (attempts[0] == 5) {
+                        output.setText("Ok you better make it soon");
+                    }
+                    if (attempts[0] == 9) {
+                        output.setText("You have one attempt left, don't waste it");
+                    }
+                    if (attempts[0] > 9) {
+                        output.setText("Game over! The correct number was " + price);
+                    }
+                } catch (NumberFormatException ex) {
+                    output.setText("Invalid input! Please enter a valid number.");
                 }
-                if(attempts == 5  && play != false){
-                    System.out.println("Ok you better make it soon");
-                }
-                if (attempts == 9  && play != false) {
-                    System.out.println("You have one attempt left, don't waste it");
-                }
-                if (attempts > 9 && play != false) {
-                    play = false;
-                    System.out.println("The correct number was " + price);
-                    System.out.println("Good luck next time!");
-                }
-   }
-            });
-        }
+            }
+        });
     }
 
     public static void Layoutset(JButton button) {
