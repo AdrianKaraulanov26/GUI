@@ -78,3 +78,4 @@ public class Main {
         button.setFocusPainted(false);
     }
 }
+// should have added a similar function for the labels, but I am too lazy
