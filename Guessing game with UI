@@ -6,17 +6,17 @@ import java.awt.event.ActionListener;
 public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Guessing game with UI");
-        frame.setSize(800, 800);
+        frame.setSize(1400, 600);
         frame.setLayout(new GridLayout(5, 1));
 
         JLabel intro = new JLabel("Welcome to the guessing game! Enter a number and I'll tell you.");
         JLabel introV1 = new JLabel("whether it is higher or lower compared to the one I have in mind.");
         JLabel introV2 = new JLabel("You can give up if you type 'I am a quitter'. BTW you have 10 guesses :)");
-        intro.setFont(new Font("Oswald", Font.PLAIN, 20));
+        intro.setFont(new Font("Oswald", Font.PLAIN, 40));
         frame.add(intro);
-        introV1.setFont(new Font("Oswald", Font.PLAIN, 20));
+        introV1.setFont(new Font("Oswald", Font.PLAIN, 40));
         frame.add(introV1);
-        introV2.setFont(new Font("Oswald", Font.PLAIN, 20));
+        introV2.setFont(new Font("Oswald", Font.PLAIN, 40));
         frame.add(introV2);
 
         JTextField userTry = new JTextField("0", 10);
@@ -34,65 +34,37 @@ public class Main {
         frame.add(output);
 
         frame.setVisible(true);
+
         int price = (int) Math.floor(Math.random() * 100);
-        final int[] attempts = {0}; // Using an array for mutability in ActionListener
+        int maxAttempts = 10;
 
         check.addActionListener(new ActionListener() {
+            int attempts = 0;
+
             public void actionPerformed(ActionEvent e) {
                 String input = userTry.getText();
-                boolean isNumeric = true;
 
-                // Validate input
-                for (int i = 0; i < input.length(); i++) {
-                    char c = input.charAt(i);
-                    if (!Character.isDigit(c) && c != '-') {
-                        isNumeric = false;
-                        break;
-                    }
+                if (input.equals("I am a quitter")) {
+                    output.setText("Hah quitter,it was " + price + "gg, try another time");
                 }
 
-                // Check if input is "I am a quitter"
-                if (input.equalsIgnoreCase("I am a quitter")) {
-                    output.setText("You quit! The correct number was " + price);
-                    return;
+                int guess = Integer.parseInt(input);
+                attempts++;
+
+                if (guess == price) {
+                    output.setText("Congratulations! You guessed it in " + attempts + " attempts.");
+                } else if (guess < price && Math.abs(price - guess)>20) {
+                    output.setText(guess + " is too low! At lest like 20");
+                } else if (guess > price && Math.abs(price - guess)>20) {
+                    output.setText(guess + " is too high! At lest like 20");
+                } else if (guess < price && Math.abs(price - guess)<20) {
+                    output.setText(guess + " is low, but you are like within 20!");
+                } else if (guess > price && Math.abs(price - guess)<20) {
+                    output.setText(guess + " is high, but you are like within 20!");
                 }
 
-                // Handle non-numeric inputs
-                if (!isNumeric || input.length() == 0) {
-                    output.setText("Invalid input! Please enter a valid number.");
-                    return;
-                }
-
-                // Convert to integer
-                int attempt = Integer.parseInt(input);
-                attempts[0]++;
-
-                // Game logic
-                if (attempt == price) {
-                    output.setText("Congratulations, you won in " + attempts[0] + " guesses!");
-                } else if (attempt < price && price - attempt < 20) {
-                    output.setText("Guess higher, you are very close.");
-                } else if (attempt > price && attempt - price < 20) {
-                    output.setText("Guess lower, you are very close.");
-                } else if (attempt < price && price - attempt >= 20) {
-                    output.setText("Guess higher, you aren't even close.");
-                } else if (attempt > price && attempt - price >= 20) {
-                    output.setText("Guess lower, you aren't even close.");
-                }
-
-                // Handle special feedback
-                switch (attempts[0]) {
-                    case 5:
-                        output.setText("Ok, you better make it soon.");
-                        break;
-                    case 9:
-                        output.setText("You have one attempt left, don't waste it.");
-                        break;
-                }
-
-                // End game after 10 attempts
-                if (attempts[0] > 9) {
-                    output.setText("Game over! The correct number was " + price);
+                if (attempts >= maxAttempts+1 && guess != price) {
+                    output.setText("I told you you had 10 attempts, greed leeds you nowhere, it was " + price + ".");
                 }
             }
         });
