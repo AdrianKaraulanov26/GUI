@@ -63,7 +63,7 @@ public class Main {
                     output.setText(guess + " is high, but you are like within 20!");
                 }
 
-                if (attempts >= maxAttempts+1 && guess != price) {
+                if (attempts >= maxAttempts && guess != price) {
                     output.setText("I told you you had 10 attempts, greed leeds you nowhere, it was " + price + ".");
                 }
             }
