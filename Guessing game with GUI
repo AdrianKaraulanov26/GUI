@@ -22,10 +22,13 @@ public class Main {
         JTextField userTry = new JTextField("0", 10);
         userTry.setFont(new Font("Oswald", Font.PLAIN, 40));
         JPanel interactive = new JPanel(new FlowLayout());
+        interactive.add(userTry);
         JButton check = new JButton("Check");
         interactive.add(check);
+        JButton reset = new JButton("Reset");
+        interactive.add(reset);
         Layoutset(check);
-        interactive.add(userTry);
+        Layoutset(reset);
 
         frame.add(interactive);
 
@@ -35,39 +38,61 @@ public class Main {
 
         frame.setVisible(true);
 
-        int price = (int) Math.floor(Math.random() * 100);
+        int price = (int) Math.floor(Math.random() * 1000);
         int maxAttempts = 10;
+        int attempts = 0;
+
+        startNewGame(price, attempts, userTry, output);
 
         check.addActionListener(new ActionListener() {
-            int attempts = 0;
-
+            int playing = 1;
+            int attempting = attempts;
             public void actionPerformed(ActionEvent e) {
                 String input = userTry.getText();
+                if (playing == 1) {
+                    if (input.equals("I am a quitter")) {
+                        output.setText("Hah quitter, it was " + price + " gg, try another time");
+                        playing = 0;
+                        return;
+                    }
 
-                if (input.equals("I am a quitter")) {
-                    output.setText("Hah quitter,it was " + price + "gg, try another time");
-                }
+                    int guess = Integer.parseInt(input);
+                    attempting++;
 
-                int guess = Integer.parseInt(input);
-                attempts++;
+                    if (guess == price) {
+                        output.setText("Congratulations! You guessed it in " + attempting + " attempts.");
+                        playing = 0;  // End the game
+                    } else if (guess < price && Math.abs(price - guess) > 20) {
+                        output.setText(guess + " is too low! At least like 20");
+                    } else if (guess > price && Math.abs(price - guess) > 20) {
+                        output.setText(guess + " is too high! At least like 20");
+                    } else if (guess < price && Math.abs(price - guess) < 20) {
+                        output.setText(guess + " is low, but you are within 20!");
+                    } else if (guess > price && Math.abs(price - guess) < 20) {
+                        output.setText(guess + " is high, but you are within 20!");
+                    }
 
-                if (guess == price) {
-                    output.setText("Congratulations! You guessed it in " + attempts + " attempts.");
-                } else if (guess < price && Math.abs(price - guess)>20) {
-                    output.setText(guess + " is too low! At lest like 20");
-                } else if (guess > price && Math.abs(price - guess)>20) {
-                    output.setText(guess + " is too high! At lest like 20");
-                } else if (guess < price && Math.abs(price - guess)<20) {
-                    output.setText(guess + " is low, but you are like within 20!");
-                } else if (guess > price && Math.abs(price - guess)<20) {
-                    output.setText(guess + " is high, but you are like within 20!");
-                }
-
-                if (attempts >= maxAttempts && guess != price) {
-                    output.setText("I told you you had 10 attempts, greed leeds you nowhere, it was " + price + ".");
+                    if (attempting >= maxAttempts && guess != price) {
+                        output.setText("I told you you had 10 attempts, greed leads you nowhere, it was " + price + ".");
+                        attempting = 0;
+                        playing = 0;
+                    }
                 }
             }
         });
+
+        reset.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                startNewGame(price, 0, userTry, output);
+            }
+        });
+    }
+
+    public static void startNewGame(int price, int attempts, JTextField userTry, JLabel output) {
+        price = (int) Math.floor(Math.random() * 1000);
+        attempts = 0;
+        userTry.setText("0");
+        output.setText("Feedback");
     }
 
     public static void Layoutset(JButton button) {
@@ -78,4 +103,3 @@ public class Main {
         button.setFocusPainted(false);
     }
 }
-// should have added a similar function for the labels, but I am too lazy
