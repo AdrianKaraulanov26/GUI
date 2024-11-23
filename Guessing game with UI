@@ -4,8 +4,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main {
+    private static JFrame frame;
+    private static JTextField userTry;
+    private static JLabel output;
+    private static int price;
+    private static int attempts;
+    private static final int maxAttempts = 10;
+    private static boolean isPlaying;
+
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Guessing game with UI");
+        frame = new JFrame("Guessing game with UI");
         frame.setSize(1400, 600);
         frame.setLayout(new GridLayout(5, 1));
 
@@ -19,42 +27,37 @@ public class Main {
         introV2.setFont(new Font("Oswald", Font.PLAIN, 40));
         frame.add(introV2);
 
-        JTextField userTry = new JTextField("0", 10);
+        userTry = new JTextField("0", 10);
         userTry.setFont(new Font("Oswald", Font.PLAIN, 40));
         JPanel interactive = new JPanel(new FlowLayout());
         interactive.add(userTry);
+
         JButton check = new JButton("Check");
         interactive.add(check);
         JButton reset = new JButton("Reset");
         interactive.add(reset);
+
         Layoutset(check);
         Layoutset(reset);
 
         frame.add(interactive);
 
-        JLabel output = new JLabel("Feedback");
+        output = new JLabel("Feedback");
         output.setFont(new Font("Oswald", Font.PLAIN, 40));
         frame.add(output);
 
         frame.setVisible(true);
 
-        // Declare game variables
-        int price = 0;
-        int attempts = 0;
-        int maxAttempts = 10;
-        boolean isPlaying = true;
-
-        // Start a new game
         startNewGame();
 
         check.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String input = userTry.getText();
 
-                if (isPlaying) { // Game is still playing
+                if (isPlaying) {
                     if (input.equals("I am a quitter")) {
                         output.setText("Hah quitter, it was " + price + " gg, try another time");
-                        isPlaying = false; // End the game
+                        isPlaying = false;
                         return;
                     }
 
@@ -64,15 +67,15 @@ public class Main {
 
                         if (guess == price) {
                             output.setText("Congratulations! You guessed it in " + attempts + " attempts.");
-                            isPlaying = false; // End the game
-                        } else if (guess < price && Math.abs(price - guess) > 20) {
-                            output.setText(guess + " is too low! At least like 20");
-                        } else if (guess > price && Math.abs(price - guess) > 20) {
-                            output.setText(guess + " is too high! At least like 20");
-                        } else if (guess < price && Math.abs(price - guess) < 20) {
-                            output.setText(guess + " is low, but you are within 20!");
-                        } else if (guess > price && Math.abs(price - guess) < 20) {
-                            output.setText(guess + " is high, but you are within 20!");
+                            isPlaying = false;
+                        } else if (guess < price && Math.abs(price - guess) > 100) {
+                            output.setText(guess + " is too low! At least like 100");
+                        } else if (guess > price && Math.abs(price - guess) > 100) {
+                            output.setText(guess + " is too high! At least like 100");
+                        } else if (guess < price && Math.abs(price - guess) < 100) {
+                            output.setText(guess + " is low, but you are within 100!");
+                        } else if (guess > price && Math.abs(price - guess) < 100) {
+                            output.setText(guess + " is high, but you are within 100!");
                         }
 
                         if (attempts >= maxAttempts && guess != price) {
@@ -90,26 +93,25 @@ public class Main {
 
         reset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                startNewGame(); // Restart the game
+                startNewGame();
             }
         });
+    }
 
-        // Method to start a new game
-        void startNewGame() {
-            price = (int) Math.floor(Math.random() * 1000); // Set the new random price
-            attempts = 0;
-            isPlaying = true;
-            userTry.setText("0");
-            output.setText("Feedback");
-        }
+    // Start a new game, setting the price, resetting attempts, and updating the output.
+    public static void startNewGame() {
+        price = (int) Math.floor(Math.random() * 1000);
+        attempts = 0;
+        isPlaying = true;
+        userTry.setText("0");
+        output.setText("Feedback");
+    }
 
-        // Method to set button style
-        void Layoutset(JButton button) {
-            button.setFont(new Font("Arial", Font.BOLD, 40));
-            button.setForeground(Color.BLACK);
-            button.setBorderPainted(false);
-            button.setContentAreaFilled(false);
-            button.setFocusPainted(false);
-        }
+    public static void Layoutset(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 40));
+        button.setForeground(Color.BLACK);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
     }
 }
