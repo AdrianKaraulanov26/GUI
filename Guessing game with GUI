@@ -38,44 +38,51 @@ public class Main {
 
         frame.setVisible(true);
 
-        int price = (int) Math.floor(Math.random() * 1000);
-        int maxAttempts = 10;
+        // Declare game variables
+        int price = 0;
         int attempts = 0;
+        int maxAttempts = 10;
+        boolean isPlaying = true;
 
-        startNewGame(price, attempts, userTry, output);
+        // Start a new game
+        startNewGame();
 
         check.addActionListener(new ActionListener() {
-            int playing = 1;
-            int attempting = attempts;
             public void actionPerformed(ActionEvent e) {
                 String input = userTry.getText();
-                if (playing == 1) {
+
+                if (isPlaying) { // Game is still playing
                     if (input.equals("I am a quitter")) {
                         output.setText("Hah quitter, it was " + price + " gg, try another time");
-                        playing = 0;
+                        isPlaying = false; // End the game
                         return;
                     }
 
-                    int guess = Integer.parseInt(input);
-                    attempting++;
+                    try {
+                        int guess = Integer.parseInt(input);
+                        attempts++;
 
-                    if (guess == price) {
-                        output.setText("Congratulations! You guessed it in " + attempting + " attempts.");
-                        playing = 0;  // End the game
-                    } else if (guess < price && Math.abs(price - guess) > 20) {
-                        output.setText(guess + " is too low! At least like 20");
-                    } else if (guess > price && Math.abs(price - guess) > 20) {
-                        output.setText(guess + " is too high! At least like 20");
-                    } else if (guess < price && Math.abs(price - guess) < 20) {
-                        output.setText(guess + " is low, but you are within 20!");
-                    } else if (guess > price && Math.abs(price - guess) < 20) {
-                        output.setText(guess + " is high, but you are within 20!");
-                    }
+                        if (guess == price) {
+                            output.setText("Congratulations! You guessed it in " + attempts + " attempts.");
+                            isPlaying = false; // End the game
+                        } else if (guess < price && Math.abs(price - guess) > 20) {
+                            output.setText(guess + " is too low! At least like 20");
+                        } else if (guess > price && Math.abs(price - guess) > 20) {
+                            output.setText(guess + " is too high! At least like 20");
+                        } else if (guess < price && Math.abs(price - guess) < 20) {
+                            output.setText(guess + " is low, but you are within 20!");
+                        } else if (guess > price && Math.abs(price - guess) < 20) {
+                            output.setText(guess + " is high, but you are within 20!");
+                        }
 
-                    if (attempting >= maxAttempts && guess != price) {
-                        output.setText("I told you you had 10 attempts, greed leads you nowhere, it was " + price + ".");
-                        attempting = 0;
-                        playing = 0;
+                        if (attempts >= maxAttempts && guess != price) {
+                            output.setText("I told you you had 10 attempts, greed leads you nowhere, it was " + price + ".");
+                            attempts = 0;
+                            isPlaying = false;
+                        }
+
+                    } catch (NumberFormatException ex) {
+                        output.setText("Please enter a valid number.");
                     }
                 }
             }
@@ -83,23 +90,26 @@ public class Main {
 
         reset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                startNewGame(price, 0, userTry, output);
+                startNewGame(); // Restart the game
             }
         });
-    }
 
-    public static void startNewGame(int price, int attempts, JTextField userTry, JLabel output) {
-        price = (int) Math.floor(Math.random() * 1000);
-        attempts = 0;
-        userTry.setText("0");
-        output.setText("Feedback");
-    }
+        // Method to start a new game
+        void startNewGame() {
+            price = (int) Math.floor(Math.random() * 1000); // Set the new random price
+            attempts = 0;
+            isPlaying = true;
+            userTry.setText("0");
+            output.setText("Feedback");
+        }
 
-    public static void Layoutset(JButton button) {
-        button.setFont(new Font("Arial", Font.BOLD, 40));
-        button.setForeground(Color.BLACK);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setFocusPainted(false);
+        // Method to set button style
+        void Layoutset(JButton button) {
+            button.setFont(new Font("Arial", Font.BOLD, 40));
+            button.setForeground(Color.BLACK);
+            button.setBorderPainted(false);
+            button.setContentAreaFilled(false);
+            button.setFocusPainted(false);
+        }
     }
 }
