@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -60,8 +61,6 @@ public class Main {
                         isPlaying = false;
                         return;
                     }
-
-                    try {
                         int guess = Integer.parseInt(input);
                         attempts++;
 
@@ -84,9 +83,6 @@ public class Main {
                             isPlaying = false;
                         }
 
-                    } catch (NumberFormatException ex) {
-                        output.setText("Please enter a valid number.");
-                    }
                 }
             }
         });
