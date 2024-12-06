@@ -10,17 +10,17 @@ public class Main {
     private static JLabel output;
     private static int price;
     private static int attempts;
-    private static final int maxAttempts = 10;
+    private static final int maxAttempts = 40;
     private static boolean isPlaying;
 
     public static void main(String[] args) {
         frame = new JFrame("Guessing game with UI");
-        frame.setSize(1400, 600);
+        frame.setSize(4000, 1600);
         frame.setLayout(new GridLayout(5, 1));
 
         JLabel intro = new JLabel("Welcome to the guessing game! Enter a number and I'll tell you.");
         JLabel introV1 = new JLabel("whether it is higher or lower compared to the one I have in mind.");
-        JLabel introV2 = new JLabel("You can give up if you type 'I am a quitter'. BTW you have 10 guesses :)");
+        JLabel introV2 = new JLabel("You can give up if you type 'I am a quitter'. BTW you have limited guesses :)");
         intro.setFont(new Font("Oswald", Font.PLAIN, 40));
         frame.add(intro);
         introV1.setFont(new Font("Oswald", Font.PLAIN, 40));
@@ -78,10 +78,11 @@ public class Main {
                         }
 
                         if (attempts >= maxAttempts && guess != price) {
-                            output.setText("I told you you had 10 attempts, greed leads you nowhere, it was " + price + ".");
+                            output.setText("I told you you had limited attempts, greed leads you nowhere, it was " + price + ".");
                             attempts = 0;
                             isPlaying = false;
                         }
+
 
                 }
             }
