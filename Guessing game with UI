@@ -10,7 +10,7 @@ public class Main {
     private static JLabel output;
     private static int price;
     private static int attempts;
-    private static final int maxAttempts = 40;
+    private static final int maxAttempts = 15;
     private static boolean isPlaying;
 
     public static void main(String[] args) {
