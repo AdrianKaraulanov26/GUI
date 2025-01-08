@@ -3,27 +3,27 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Main {
-
     private JFrame frame;
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Main().createGUI());
+        SwingUtilities.invokeLater(() -> new Main().createGUI()); //don't understand how this works, I stole someone else's code a little bit
     }
 
     public void createGUI() {
         // Set up the main frame
         frame = new JFrame("Phone clock app");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(2040, 1160);
-        frame.setLocationRelativeTo(null); // Center the frame on the screen
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // shuts down the program when you close the window
+        frame.setSize(2040, 1160); //I am too lazy to look up the resolution
+        frame.setLocationRelativeTo(null); // Setting the relative location to null centers it, I don't know how I can center it on other places for now
 
-        // CardLayout is used to switch between panels
+
+        // Creating the card Layout ( the best skill ) + setting the main panel
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Create panels for different tasks
+        // Naming and ordering of different panels
         JPanel mainMenuPanel = createMainMenuPanel();
         JPanel panel1 = createPanel("Countdown", 1);
         JPanel panel2 = createPanel("Stopwatch", 2);
@@ -32,7 +32,7 @@ public class Main {
         JPanel panel5 = createPanel("Time", 5);
         JPanel panel6 = createPanel("Click Counter", 6);
 
-        // Add all panels to the main panel using CardLayout
+        // Add all panels to the main panel using CardLayout, including the main menu panel
         mainPanel.add(mainMenuPanel, "MainMenu");
         mainPanel.add(panel1, "Panel1");
         mainPanel.add(panel2, "Panel2");
@@ -41,49 +41,49 @@ public class Main {
         mainPanel.add(panel5, "Panel5");
         mainPanel.add(panel6, "Panel6");
 
-        // Set the initial panel to be the main menu
+        // CardLayout is used to switch between panels
+        // Set the initial panel to be the main menu, I debated putting the clock as the main screen, but the menu looks cleaner
         cardLayout.show(mainPanel, "MainMenu");
 
-        // Add the main panel to the frame
         frame.add(mainPanel);
         frame.setVisible(true);
     }
-
+    // method for creating the MainMenu
     public JPanel createMainMenuPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 5, 20, 20)); // 5 columns with spacing
         panel.setBackground(new Color(30, 30, 30)); // Dark background for the menu
 
-        // Define the icons (you can replace these with your own images)
+        // Defining the icons + the number of icons determines the number of windows, putting them in a String makes it more efficient
         String[] iconPaths = {
             "H:\\Countdown.png", "H:\\Timer.png", "H:\\Alarm clock.png", "H:\\Calendar.png", "H:\\Clock.png", "H:\\Cookie.png"
         };
 
-        // Create buttons with icons
+        // Creating buttons with icons
         for (int i = 0; i < iconPaths.length; i++) {
             ImageIcon icon = new ImageIcon(iconPaths[i]);
             JButton button = new JButton(icon);
             button.setPreferredSize(new Dimension(60, 60)); // Set button size
             int panelNumber = i + 1; // Panel numbers: 1, 2, 3, 4, 5
 
-            // Add ActionListener to switch to the corresponding panel
+            // Switching to the panels depending on the icon clicked, it changes the main panel depending 
             button.addActionListener(e -> {
                 cardLayout.show(mainPanel, "Panel" + panelNumber);
             });
 
-            // Add hover effect using MouseListener
+            // Hovering effects and coloring
             button.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    button.setBackground(new Color(100, 100, 255)); // Hover color
+                    button.setBackground(new Color(120, 120, 120)); //background of a button as you hover over it (a bit brighter than the rest
                 }
 
                 public void mouseExited(java.awt.event.MouseEvent evt) {
-                    button.setBackground(new Color(60, 60, 60)); // Reset color
+                    button.setBackground(new Color(60, 60, 60)); // background of button after it has been hovered over
                 }
             });
 
-            // Style the button
-            button.setBackground(new Color(60, 60, 60)); // Default dark background
+            // Stilizing the button
+            button.setBackground(new Color(60, 60, 60)); // Set background of button
             button.setBorder(BorderFactory.createEmptyBorder());
             button.setFocusPainted(false);
             panel.add(button);
@@ -99,9 +99,9 @@ public class Main {
 
         // Create the return button
         JButton returnButton = new JButton("Return to Main Menu");
-        returnButton.setFont(new Font("Arial", Font.PLAIN, 60));
-        returnButton.setBackground(new Color(200, 100, 100)); // Red return button
-        returnButton.setForeground(Color.WHITE);
+        returnButton.setFont(new Font("Arial", Font.HANGING_BASELINE, 60));
+        returnButton.setBackground(new Color(255, 255, 255)); // Red return button
+        returnButton.setForeground(Color.BLACK);
         returnButton.setFocusPainted(false);
 
         returnButton.addActionListener(e -> {
