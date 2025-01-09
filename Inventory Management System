@@ -1,0 +1,222 @@
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+// making the Product class
+class Product {
+    private String name;
+    private double price;
+    private int quantity;
+    //constructing the basic items
+    public Product(String name, double price, int quantity) {
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+    }
+    //getters and setters
+    public String getName() {
+        return name;
+    }
+    public double getPrice() {
+        return price;
+    }
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void updatePrice(double price) {
+        this.price = price;
+    }
+    public void updateQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+
+    // Generating a String, which can be passed to the text field
+    public String displayProduct() {
+
+        return "Name: " + name + ", Price: " + price + ", Quantity: " + quantity + "\n";
+    }
+}
+
+// Creating an Inventory, where we can use composition in order to create new Items
+class Inventory {
+    private Product[] products; //creating the array of products
+    private int productCount;
+    private int maximumQuantity = 3;
+    public Inventory() {
+        products = new Product[maximumQuantity]; // Setting the limiting factor for the amount of products aka maximumQuantity
+        productCount = 0;
+    }
+
+    // Method to add new products
+    public String addProduct(String name, double price, int quantity) {
+        if (productCount >= maximumQuantity) {
+            return "Inventory is full. Cannot add more products.\n";
+        }
+
+        products[productCount++] = new Product(name, price, quantity); //using the product number to define its position and
+        return "Product added successfully.\n";
+    }
+
+    // Product updater
+    public String updateProduct(String name, double price, int quantity) {
+        for (int i = 0; i < productCount; i++) {
+            if (products[i].getName().equalsIgnoreCase(name)) { // checking which product to update based on the name in the top textbox
+                products[i].updatePrice(price);
+                products[i].updateQuantity(quantity);
+                return "Product updated successfully.\n";
+            }
+        }
+        return "Product not found.\n"; //returning an error message in case no product can be updated
+    }
+
+    public String displayAllProducts() {
+        if (productCount == 0) {
+            return "No products in inventory.\n";
+        }
+
+        StringBuilder allProducts = new StringBuilder(); // I define a String builder, so I can use the method for printing the product information for every single item in the array
+        for (int i = 0; i < productCount; i++) {
+            allProducts.append(products[i].displayProduct()); // Adding the individual messages to the string builder
+        }
+        return allProducts.toString();  // returning all the text messages at the same time, implementing the fact we used \n to enter the new lines continuously
+        // The text messages explaining my code are for me as well, since the String Builder was a new method for me
+    }
+}
+
+// Step 3: Build the GUI
+public class Main {
+    public static void main(String[] args) {
+        Inventory inventory = new Inventory();
+
+        // Creating the main Frame
+        JFrame frame = new JFrame("Inventory Management System - Final Project (Semester 1)");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1700, 1200);
+        frame.setLayout(new BorderLayout(20, 20));
+
+        // Title Section
+        JLabel titleLabel = new JLabel("Inventory Management System", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        titleLabel.setOpaque(true);
+        titleLabel.setBackground(new Color(63, 81, 181));
+        titleLabel.setForeground(Color.WHITE);
+        frame.add(titleLabel, BorderLayout.NORTH);
+
+        // Input Panel Section
+        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 15, 15));
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        inputPanel.setBackground(new Color(240, 240, 240));
+
+        JLabel nameLabel = createStyledLabel("Product Name:");
+        JLabel priceLabel = createStyledLabel("Price:");
+        JLabel quantityLabel = createStyledLabel("Quantity:");
+        JTextField nameField = createStyledTextField();
+        JTextField priceField = createStyledTextField();
+        JTextField quantityField = createStyledTextField();
+        JButton addButton = createStyledButton("Add Product", new Color(75, 175, 80));
+        JButton updateButton = createStyledButton("Update Product", new Color(30, 150, 250));
+
+        inputPanel.add(nameLabel);
+        inputPanel.add(nameField);
+        inputPanel.add(priceLabel);
+        inputPanel.add(priceField);
+        inputPanel.add(quantityLabel);
+        inputPanel.add(quantityField);
+        inputPanel.add(addButton);
+        inputPanel.add(updateButton);
+
+        frame.add(inputPanel, BorderLayout.WEST);
+
+        // Display Panel Section
+        JPanel displayPanel = new JPanel(new BorderLayout());
+        Font borderFont = new Font("Arial", Font.BOLD, 30);
+        displayPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.GRAY, 2),
+                "Inventory",
+                TitledBorder.DEFAULT_JUSTIFICATION,
+                TitledBorder.DEFAULT_POSITION,
+                borderFont
+        ));
+
+        JTextArea outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 34)); // Increased font size
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+
+        JButton displayButton = createStyledButton("Display Products", new Color(255, 90, 40)); // Orange
+        displayPanel.add(scrollPane, BorderLayout.CENTER);
+        displayPanel.add(displayButton, BorderLayout.SOUTH);
+
+        frame.add(displayPanel, BorderLayout.CENTER);
+
+
+
+        //functionality
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try { //stack overflow told me it was the easiest way of implementation, so try and catch it is
+                    String name = nameField.getText();
+                    double price = Double.parseDouble(priceField.getText());
+                    int quantity = Integer.parseInt(quantityField.getText());
+                    String result = inventory.addProduct(name, price, quantity);
+                    outputArea.append(result);
+                } catch (NumberFormatException ex) {
+                    outputArea.append("Invalid input. Please enter valid price and quantity.\n");
+                }
+            }
+        });
+
+        updateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String name = nameField.getText();
+                    double price = Double.parseDouble(priceField.getText());
+                    int quantity = Integer.parseInt(quantityField.getText());
+                    String result = inventory.updateProduct(name, price, quantity);
+                    outputArea.append(result);
+                } catch (NumberFormatException ex) {
+                    outputArea.append("Invalid input. Please enter valid price and quantity.\n");
+                }
+            }
+        });
+
+        displayButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                outputArea.setText("");
+                String result = inventory.displayAllProducts();
+                outputArea.append(result);
+            }
+        });
+        frame.setVisible(true);
+    }
+    //Methor to style buttons
+    private static JButton createStyledButton(String text, Color backgroundColor) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 30));
+        button.setBackground(backgroundColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Add padding
+        return button;
+    }
+
+    // Method to style text fields
+    private static JTextField createStyledTextField() {
+        JTextField textField = new JTextField();
+        textField.setFont(new Font("Arial", Font.PLAIN, 30));
+        textField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        textField.setMargin(new Insets(5, 10, 5, 10));
+        return textField;
+    }
+
+    // Method to style labels
+    private static JLabel createStyledLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 30)); //
+        return label;
+    }
+}
