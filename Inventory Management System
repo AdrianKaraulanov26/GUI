@@ -98,7 +98,7 @@ public class Main {
         frame.setLayout(new BorderLayout(20, 20));
 
         // Title Section
-        JLabel titleLabel = new JLabel("Inventory Management System", JLabel.CENTER);
+        JLabel titleLabel = new JLabel("Inventory Management System - Final Project (Semester 1)", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
         titleLabel.setOpaque(true);
