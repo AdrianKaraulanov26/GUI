@@ -1,102 +1,193 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+class TimerPanel {
+    private Timer timer;
+    private int timeLeft;
+    private JLabel countdownLabel;
+    private JButton startButton, stopButton, resetButton;
+    private JComboBox<String> timeSelector;
+
+    public TimerPanel(JLabel countdownLabel, JButton startButton, JButton stopButton, JButton resetButton, JComboBox<String> timeSelector) {
+        this.countdownLabel = countdownLabel;
+        this.startButton = startButton;
+        this.stopButton = stopButton;
+        this.resetButton = resetButton;
+        this.timeSelector = timeSelector;
+        this.timeLeft = 0;
+
+        timer = new Timer(1000, e -> updateCountdown());
+
+        startButton.addActionListener(e -> startCountdown());
+        stopButton.addActionListener(e -> stopCountdown());
+        resetButton.addActionListener(e -> resetCountdown());
+    }
+
+    private void startCountdown() {
+        if (!timer.isRunning()) {
+            if (timeLeft == 0) {
+                String selectedTime = (String) timeSelector.getSelectedItem();
+                timeLeft = parseTime(selectedTime);
+                countdownLabel.setText(selectedTime);
+            }
+            timer.start();
+        }
+    }
+
+    private void stopCountdown() {
+        timer.stop();
+    }
+
+    private void resetCountdown() {
+        timer.stop();
+        timeLeft = 0;
+        countdownLabel.setText((String) timeSelector.getSelectedItem());
+    }
+
+    private void updateCountdown() {
+        if (timeLeft > 0) {
+            timeLeft--;
+            countdownLabel.setText(formatTime(timeLeft));
+        } else {
+            timer.stop();
+            countdownLabel.setText((String) timeSelector.getSelectedItem());
+        }
+    }
+    // method for taking the string within the label and turning it into seconds
+    private int parseTime(String time) {
+        String[] parts = time.split(":");
+        int minutes = Integer.parseInt(parts[0]);
+        int seconds = Integer.parseInt(parts[1]);
+        return minutes * 60 + seconds;
+    }
+
+    private String formatTime(int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+}
+class StopwatchPanel {
+    private int time_stopwatch;
+    private JLabel stopwatchLabel, flagLabel;
+    private JButton startButton, stopButton, resetButton, flagButton;
+    private Timer timer;
+
+    public StopwatchPanel(JLabel stopwatchLabel, JLabel flagLabel, JButton startButton, JButton stopButton, JButton resetButton, JButton flagButton) {
+        this.stopwatchLabel = stopwatchLabel;
+        this.flagLabel = flagLabel;
+        this.startButton = startButton;
+        this.stopButton = stopButton;
+        this.resetButton = resetButton;
+        this.flagButton = flagButton;
+        this.time_stopwatch = 0;
+        timer = new Timer(1000, e -> updateCountdown());
+
+        startButton.addActionListener(e -> start_stopwatch());
+        stopButton.addActionListener(e -> stop_stopwatch());
+        resetButton.addActionListener(e -> resetCountdown());
+        flagButton.addActionListener(e -> flag_countdown());
+    }
+
+    private void start_stopwatch() {
+        timer.start();
+    }
+    private void stop_stopwatch(){
+        timer.stop();
+    }
+    private void resetCountdown(){
+        timer.stop();
+        time_stopwatch = 0;
+        stopwatchLabel.setText("00:00");
+        flagLabel.setText("00:00");
+    }
+    private void updateCountdown() {
+        if (time_stopwatch >= 0) {
+            time_stopwatch++;
+            stopwatchLabel.setText(formatTime(time_stopwatch));
+        }
+    }
+    private void flag_countdown(){
+        flagLabel.setText(stopwatchLabel.getText());
+    }
+    public String formatTime(int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+}
 public class Main {
     private JFrame frame;
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Main().createGUI()); //don't understand how this works, I stole someone else's code a little bit
+        SwingUtilities.invokeLater(() -> new Main().createGUI());
     }
 
     public void createGUI() {
-        // Set up the main frame
-        frame = new JFrame("Phone clock app");
+        frame = new JFrame("Phone Clock App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(2040, 1160); //I am too lazy to look up the resolution
-        frame.setLocationRelativeTo(null); // Setting the relative location to null centers it, I don't know how I can center it on other places for now
+        frame.setSize(2040, 1160);
+        frame.setLocationRelativeTo(null);
 
-
-        // Creating the card Layout ( the best skill ) + setting the main panel
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Naming. ordering of different panels and structuring the individual layouts
         JPanel mainMenuPanel = createMainMenuPanel();
-        JPanel panel1 = createPanel("Countdown", 1);
-        JLabel countdown = Create_label("00:00", 200, 530, 150, 900, 400);
-        JButton start = Create_button("Start", 50, 530, 620, 400, 80);
-        JButton stop = Create_button("Stop", 50, 1020, 620, 400, 80);
-        JButton reset = Create_button("Reset", 50, 1020, 760, 400, 80);
-        String[] timelines = {
-                "01:00", "02:00", "05:00", "10:00"
-        };
-        JComboBox comboBox = Create_combobox(timelines, 50, 530, 760, 400, 80);
-        panel1.add(countdown);
-        panel1.add(start);
-        panel1.add(stop);
-        panel1.add(reset);
-        panel1.add(comboBox);
-        JPanel panel2 = createPanel("Stopwatch", 2);
+        JPanel countdownPanel = createCountdownPanel();
+        JPanel panel2 = createStopwatchPanel();
         JPanel panel3 = createPanel("Alarm Clock", 3);
         JPanel panel4 = createPanel("Date Reminder", 4);
         JPanel panel5 = createPanel("Time", 5);
         JPanel panel6 = createPanel("Click Counter", 6);
 
-        // Add all panels to the main panel using CardLayout, including the main menu panel
         mainPanel.add(mainMenuPanel, "MainMenu");
-        mainPanel.add(panel1, "Panel1");
+        mainPanel.add(countdownPanel, "Panel1");
         mainPanel.add(panel2, "Panel2");
         mainPanel.add(panel3, "Panel3");
         mainPanel.add(panel4, "Panel4");
         mainPanel.add(panel5, "Panel5");
         mainPanel.add(panel6, "Panel6");
 
-        // CardLayout is used to switch between panels
-        // Set the initial panel to be the main menu, I debated putting the clock as the main screen, but the menu looks cleaner
         cardLayout.show(mainPanel, "MainMenu");
 
         frame.add(mainPanel);
         frame.setVisible(true);
     }
-    // method for creating the MainMenu
+
     public JPanel createMainMenuPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 5, 20, 20)); // 5 columns with spacing
-        panel.setBackground(new Color(30, 30, 30)); // Dark background for the menu
+        panel.setLayout(new GridLayout(2, 5, 20, 20));
+        panel.setBackground(new Color(30, 30, 30));
 
-        // Defining the icons + the number of icons determines the number of windows, putting them in a String makes it more efficient
         String[] iconPaths = {
-            "H:\\Countdown.png", "H:\\Timer.png", "H:\\Alarm clock.png", "H:\\Calendar.png", "H:\\Clock.png", "H:\\Cookie.png"
+                "H:\\Countdown.png", "H:\\Timer.png", "H:\\Alarm clock.png", "H:\\Calendar.png", "H:\\Clock.png", "H:\\Cookie.png"
         };
 
-        // Creating buttons with icons
         for (int i = 0; i < iconPaths.length; i++) {
             ImageIcon icon = new ImageIcon(iconPaths[i]);
             JButton button = new JButton(icon);
-            button.setPreferredSize(new Dimension(60, 60)); // Set button size
-            int panelNumber = i + 1; // Panel numbers: 1, 2, 3, 4, 5
+            button.setPreferredSize(new Dimension(60, 60));
+            int panelNumber = i + 1;
 
-            // Switching to the panels depending on the icon clicked, it changes the main panel depending
             button.addActionListener(e -> {
                 cardLayout.show(mainPanel, "Panel" + panelNumber);
             });
 
-            // Hovering effects and coloring
             button.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    button.setBackground(new Color(120, 120, 120)); //background of a button as you hover over it (a bit brighter than the rest
+                    button.setBackground(new Color(120, 120, 120));
                 }
 
                 public void mouseExited(java.awt.event.MouseEvent evt) {
-                    button.setBackground(new Color(60, 60, 60)); // background of button after it has been hovered over
+                    button.setBackground(new Color(60, 60, 60));
                 }
             });
 
-            // Stilizing the buttons
-            button.setBackground(new Color(60, 60, 60)); // Set background of button
+            button.setBackground(new Color(60, 60, 60));
             button.setBorder(BorderFactory.createEmptyBorder());
             button.setFocusPainted(false);
             panel.add(button);
@@ -105,43 +196,86 @@ public class Main {
         return panel;
     }
 
-    // Creates a simple panel with a title and a return button
-    public JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length){
+    public JPanel createCountdownPanel() {
+        JPanel panel1 = createPanel("Countdown", 1);
+        JLabel countdown = Create_label("00:00", 200, 530, 125, 900, 400);
+        JButton start = Create_button("Start", 50, 530, 550, 400, 80, 12, 200, 12);
+        JButton stop = Create_button("Stop", 50, 1020, 550, 400, 80, 200, 12, 12);
+        JButton reset = Create_button("Reset", 50, 1020, 655, 400, 80, 200, 200, 100);
+
+        String[] timelines = {
+                "01:00", "02:00", "05:00", "10:00"
+        };
+        JComboBox<String> comboBox = Create_combobox(timelines, 45, 530, 655, 400, 80);
+
+        panel1.add(countdown);
+        panel1.add(start);
+        panel1.add(stop);
+        panel1.add(reset);
+        panel1.add(comboBox);
+
+        // Initialize TimerPanel logic
+        new TimerPanel(countdown, start, stop, reset, comboBox);
+
+        return panel1;
+    }
+
+    public JPanel createStopwatchPanel() {
+        JPanel panel2 = createPanel("Stopwatch", 2);
+        JLabel countdown_stop = Create_label("00:00", 200, 530, 125, 900, 400);
+        JButton start_stop = Create_button("Start", 50, 530, 550, 400, 80, 12, 200, 12);
+        JButton stop_stop = Create_button("Stop", 50, 1020, 550, 400, 80, 200, 12, 12);
+        JButton reset_stop = Create_button("Reset", 50, 1020, 655, 400, 80, 200, 200, 12);
+        JButton flag_stop = Create_button("Flag", 50, 530, 655, 400, 80, 12, 155, 155);
+        JLabel flag_time = Create_label("00:00", 100, 530, 760, 900, 200);
+        panel2.add(countdown_stop);
+        panel2.add(start_stop);
+        panel2.add(stop_stop);
+        panel2.add(reset_stop);
+        panel2.add(flag_stop);
+        panel2.add(flag_time);
+        new StopwatchPanel(countdown_stop, flag_time, start_stop, stop_stop, reset_stop, flag_stop);
+        return panel2;
+    }
+
+    public JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length, int red, int green, int blue) {
         JButton button = new JButton(name);
         button.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
         button.setOpaque(true);
-        button.setBackground(new Color(63, 81, 181));
-        button.setBounds(xstart,ystart,width,length);
+        button.setBackground(new Color(red, green, blue));
+        button.setBounds(xstart, ystart, width, length);
         button.setHorizontalAlignment(SwingConstants.CENTER);
         button.setFocusPainted(false);
         button.setForeground(Color.WHITE);
         return button;
     }
-    public JLabel Create_label(String name, int font_size, int xstart, int ystart, int width, int length){
-        JLabel label= new JLabel(name);
+
+    public JLabel Create_label(String name, int font_size, int xstart, int ystart, int width, int length) {
+        JLabel label = new JLabel(name);
         label.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
         label.setOpaque(true);
         label.setBackground(new Color(63, 81, 181));
-        label.setBounds(xstart,ystart,width,length);
+        label.setBounds(xstart, ystart, width, length);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.WHITE);
         return label;
     }
+
     public JComboBox<String> Create_combobox(String[] items, int font_size, int xstart, int ystart, int width, int length) {
-    JComboBox<String> comboBox = new JComboBox<>(items);
-    comboBox.setFont(new Font("Arial", Font.PLAIN, font_size));
-    comboBox.setBounds(xstart, ystart, width, length);
-    comboBox.setOpaque(true);
-    comboBox.setBackground(new Color(63, 81, 181));
-    comboBox.setForeground(Color.WHITE);
-    comboBox.setFocusable(false); // To make it not focusable (similar to button's setFocusPainted(false))
-    return comboBox;
-}
+        JComboBox<String> comboBox = new JComboBox<>(items);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, font_size));
+        comboBox.setBounds(xstart, ystart, width, length);
+        comboBox.setOpaque(true);
+        comboBox.setBackground(new Color(63, 81, 181));
+        comboBox.setForeground(Color.WHITE);
+        comboBox.setFocusable(false);
+        return comboBox;
+    }
+
     public JPanel createPanel(String title, int panelNumber) {
         JPanel panel = new JPanel();
         panel.setLayout(null);
 
-        // Create the return button
         JButton returnButton = new JButton("Return to Main Menu");
         returnButton.setFont(new Font("Arial", Font.HANGING_BASELINE, 60));
         returnButton.setBackground(new Color(255, 255, 255));
@@ -150,10 +284,11 @@ public class Main {
         returnButton.setFocusPainted(false);
 
         returnButton.addActionListener(e -> {
-             cardLayout.show(mainPanel, "MainMenu");
+            cardLayout.show(mainPanel, "MainMenu");
         });
 
         panel.add(returnButton);
+
         JLabel taskLabel = new JLabel(title);
         taskLabel.setFont(new Font("Arial", Font.HANGING_BASELINE, 80));
         taskLabel.setBackground(new Color(255, 255, 255));
@@ -163,7 +298,6 @@ public class Main {
         taskLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         panel.add(taskLabel);
-
         panel.setBackground(new Color(45, 45, 45));
 
         return panel;
