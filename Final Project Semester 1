@@ -14,7 +14,7 @@ public class Main {
     public void createGUI() {
         // Set up the main frame
         frame = new JFrame("Phone clock app");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // shuts down the program when you close the window
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(2040, 1160); //I am too lazy to look up the resolution
         frame.setLocationRelativeTo(null); // Setting the relative location to null centers it, I don't know how I can center it on other places for now
 
@@ -23,9 +23,13 @@ public class Main {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Naming and ordering of different panels
+        // Naming. ordering of different panels and structuring the individual layouts
         JPanel mainMenuPanel = createMainMenuPanel();
         JPanel panel1 = createPanel("Countdown", 1);
+        JLabel countdown = Create_label("00:00", 150, 530, 200, 900, 500);
+        JButton start = Create_button("Start", 50, 500, 750, 250, 80);
+        panel1.add(countdown);
+        panel1.add(start);
         JPanel panel2 = createPanel("Stopwatch", 2);
         JPanel panel3 = createPanel("Alarm Clock", 3);
         JPanel panel4 = createPanel("Date Reminder", 4);
@@ -66,7 +70,7 @@ public class Main {
             button.setPreferredSize(new Dimension(60, 60)); // Set button size
             int panelNumber = i + 1; // Panel numbers: 1, 2, 3, 4, 5
 
-            // Switching to the panels depending on the icon clicked, it changes the main panel depending 
+            // Switching to the panels depending on the icon clicked, it changes the main panel depending
             button.addActionListener(e -> {
                 cardLayout.show(mainPanel, "Panel" + panelNumber);
             });
@@ -82,7 +86,7 @@ public class Main {
                 }
             });
 
-            // Stilizing the button
+            // Stilizing the buttons
             button.setBackground(new Color(60, 60, 60)); // Set background of button
             button.setBorder(BorderFactory.createEmptyBorder());
             button.setFocusPainted(false);
@@ -93,35 +97,54 @@ public class Main {
     }
 
     // Creates a simple panel with a title and a return button
+    public JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length){
+        JButton button = new JButton(name);
+        button.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
+        button.setOpaque(true);
+        button.setBackground(new Color(63, 81, 181));
+        button.setBounds(xstart,ystart,width,length);
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setFocusPainted(false);
+        button.setForeground(Color.WHITE);
+        return button;
+    }
+    public JLabel Create_label(String name, int font_size, int xstart, int ystart, int width, int length){
+        JLabel label= new JLabel(name);
+        label.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
+        label.setOpaque(true);
+        label.setBackground(new Color(63, 81, 181));
+        label.setBounds(xstart,ystart,width,length);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        return label;
+    }
     public JPanel createPanel(String title, int panelNumber) {
         JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        panel.setLayout(null);
 
         // Create the return button
         JButton returnButton = new JButton("Return to Main Menu");
         returnButton.setFont(new Font("Arial", Font.HANGING_BASELINE, 60));
-        returnButton.setBackground(new Color(255, 255, 255)); // Red return button
+        returnButton.setBackground(new Color(255, 255, 255));
         returnButton.setForeground(Color.BLACK);
+        returnButton.setBounds(0, 1000, 2000, 100);
         returnButton.setFocusPainted(false);
 
         returnButton.addActionListener(e -> {
-            // Go back to the main menu
-            cardLayout.show(mainPanel, "MainMenu");
+             cardLayout.show(mainPanel, "MainMenu");
         });
 
-        // Add return button at the bottom of the panel
-        panel.add(returnButton, BorderLayout.SOUTH);
-
-        // Add task button to simulate some task (e.g., executing code)
-        JPanel info = new JPanel();
+        panel.add(returnButton);
         JLabel taskLabel = new JLabel(title);
         taskLabel.setFont(new Font("Arial", Font.HANGING_BASELINE, 80));
-        taskLabel.setBackground(new Color(30, 30, 255));
+        taskLabel.setBackground(new Color(255, 255, 255));
+        taskLabel.setOpaque(true);
         taskLabel.setForeground(Color.BLACK);
-        info.add(taskLabel);
-        panel.add(info, BorderLayout.NORTH);
+        taskLabel.setBounds(0, 0, 2000, 100);
+        taskLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Set background color of each task panel
+        panel.add(taskLabel);
+
         panel.setBackground(new Color(45, 45, 45));
 
         return panel;
