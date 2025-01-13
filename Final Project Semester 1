@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 class TimerPanel {
     private Timer timer;
@@ -118,15 +120,102 @@ class StopwatchPanel {
         return String.format("%02d:%02d", minutes, seconds);
     }
 }
+class FitnessTracker {
+    private int reps;
+    private int sets;
+    private int caloriesBurned;
+    private int repsLimit;
+
+    public FitnessTracker() {
+        this.reps = 0;
+        this.sets = 0;
+        this.caloriesBurned = 0;
+        this.repsLimit = 10; // Default reps limit
+    }
+
+    public void incrementReps(int caloriesPerRep) {
+        reps++;
+        caloriesBurned += caloriesPerRep;
+        if (reps >= repsLimit) {
+            reps = 0;
+            sets++;
+        }
+    }
+
+    public void setRepsLimit(int repsLimit) {
+        this.repsLimit = repsLimit;
+    }
+
+    public int getReps() {
+        return reps;
+    }
+
+    public int getSets() {
+        return sets;
+    }
+
+    public int getCaloriesBurned() {
+        return caloriesBurned;
+    }
+
+    public void resetTracker() {
+        this.reps = 0;
+        this.sets = 0;
+        this.caloriesBurned = 0;
+    }
+}
+class CalorieTracker {
+    private int caloriesConsumed;
+    private int protein;
+    private int carbs;
+    private int fats;
+
+    public CalorieTracker() {
+        this.caloriesConsumed = 0;
+        this.protein = 0;
+        this.carbs = 0;
+        this.fats = 0;
+    }
+
+    public void addMacros(int protein, int carbs, int fats, int calories) {
+        this.protein += protein;
+        this.carbs += carbs;
+        this.fats += fats;
+        this.caloriesConsumed += calories;
+    }
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public int getCarbs() {
+        return carbs;
+    }
+
+    public int getFats() {
+        return fats;
+    }
+
+    public int getCaloriesConsumed() {
+        return caloriesConsumed;
+    }
+
+    public void resetTracker() {
+        this.caloriesConsumed = 0;
+        this.protein = 0;
+        this.carbs = 0;
+        this.fats = 0;
+    }
+}
 public class Main {
     private JFrame frame;
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Main().createGUI());
+        new Main().createGUI();
     }
-
+    // the GUI is the main component of the Main class, since the cardLayout and JPanels have to bo defined for the entire class, not individual methods
     public void createGUI() {
         frame = new JFrame("Phone Clock App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -139,9 +228,9 @@ public class Main {
         JPanel mainMenuPanel = createMainMenuPanel();
         JPanel countdownPanel = createCountdownPanel();
         JPanel panel2 = createStopwatchPanel();
-        JPanel panel3 = createPanel("Alarm Clock", 3);
-        JPanel panel4 = createPanel("Date Reminder", 4);
-        JPanel panel5 = createPanel("Time", 5);
+        JPanel panel3 = createFitnessTrackerPanel();
+        JPanel panel4 = createCalorieTrackerPanel();
+        JPanel panel5 = createPanel("Dino game", 5);
         JPanel panel6 = createPanel("Click Counter", 6);
 
         mainPanel.add(mainMenuPanel, "MainMenu");
@@ -163,12 +252,22 @@ public class Main {
         panel.setLayout(new GridLayout(2, 5, 20, 20));
         panel.setBackground(new Color(30, 30, 30));
 
-        String[] iconPaths = {
-                "H:\\Countdown.png", "H:\\Timer.png", "H:\\Alarm clock.png", "H:\\Calendar.png", "H:\\Clock.png", "H:\\Cookie.png"
-        };
+        URL[] iconURLs = null;
+        try {
+            iconURLs = new URL[]{
+                    new URL("https://cdn-icons-png.flaticon.com/512/4893/4893024.png"), // Online URL
+                    new URL("https://cdn-icons-png.flaticon.com/512/3003/3003202.png"), // Local file paths use "file:///" prefix
+                    new URL("https://cdn-icons-png.flaticon.com/512/6750/6750831.png"), // Replace spaces with "%20"
+                    new URL("https://cdn-icons-png.flaticon.com/512/2058/2058065.png"),
+                    new URL("https://cdn-icons-png.flaticon.com/512/8337/8337182.png"),
+                    new URL("https://cdn-icons-png.flaticon.com/512/614/614180.png")
+            };
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
 
-        for (int i = 0; i < iconPaths.length; i++) {
-            ImageIcon icon = new ImageIcon(iconPaths[i]);
+        for (int i = 0; i < iconURLs.length; i++) {
+            ImageIcon icon = new ImageIcon(iconURLs[i]);
             JButton button = new JButton(icon);
             button.setPreferredSize(new Dimension(60, 60));
             int panelNumber = i + 1;
@@ -238,6 +337,101 @@ public class Main {
         return panel2;
     }
 
+    public JPanel createFitnessTrackerPanel() {
+        JPanel panel = createPanel("Fitness Tracker", 3);
+
+        JLabel setsLabel = Create_label("Sets: 0", 50, 50, 200, 300, 100);
+        JLabel repsLabel = Create_label("Reps: 0", 50, 50, 320, 300, 100);
+        JLabel caloriesLabel = Create_label("Calories: 0", 50, 50, 440, 300, 100);
+
+        JButton repButton = Create_button("Add Rep", 40, 400, 200, 400, 100, 50, 200, 50);
+        JComboBox<String> regimeSelector = Create_combobox(new String[]{"6", "8", "10", "12", "14"}, 30, 50, 560, 300, 80);
+
+        FitnessTracker fitnessTracker = new FitnessTracker();
+
+        repButton.addActionListener(e -> {
+            fitnessTracker.incrementReps(5); // Assuming 5 calories per rep
+            setsLabel.setText("Sets: " + fitnessTracker.getSets());
+            repsLabel.setText("Reps: " + fitnessTracker.getReps());
+            caloriesLabel.setText("Calories: " + fitnessTracker.getCaloriesBurned());
+        });
+
+        regimeSelector.addActionListener(e -> {
+            String selectedRegime = (String) regimeSelector.getSelectedItem();
+            fitnessTracker.setRepsLimit(Integer.parseInt(selectedRegime));
+        });
+
+        panel.add(setsLabel);
+        panel.add(repsLabel);
+        panel.add(caloriesLabel);
+        panel.add(repButton);
+        panel.add(regimeSelector);
+
+        return panel;
+    }
+
+    public JPanel createCalorieTrackerPanel() {
+        JPanel panel = createPanel("Calorie Counter", 4);
+
+        JLabel proteinLabel = Create_label("Protein: 0g", 40, 50, 200, 300, 80);
+        JLabel carbsLabel = Create_label("Carbs: 0g", 40, 50, 300, 300, 80);
+        JLabel fatsLabel = Create_label("Fats: 0g", 40, 50, 400, 300, 80);
+        JLabel caloriesLabel = Create_label("Calories: 0", 40, 50, 500, 300, 80);
+
+        JComboBox<String> proteinDropdown = Create_combobox(new String[]{"Chicken - 30g protein, 150 cal", "Eggs - 12g protein, 70 cal"}, 25, 400, 200, 600, 50);
+        JComboBox<String> carbsDropdown = Create_combobox(new String[]{"Rice - 40g carbs, 200 cal", "Bread - 20g carbs, 120 cal"}, 25, 400, 300, 600, 50);
+        JComboBox<String> snackDropdown = Create_combobox(new String[]{"Chips - 10g fat, 150 cal", "Chocolate - 15g fat, 250 cal"}, 25, 400, 400, 600, 50);
+
+        CalorieTracker calorieTracker = new CalorieTracker();
+
+        proteinDropdown.addActionListener(e -> {
+            String selectedItem = (String) proteinDropdown.getSelectedItem();
+            if (selectedItem.contains("Chicken")) {
+                calorieTracker.addMacros(30, 0, 0, 150);
+            } else if (selectedItem.contains("Eggs")) {
+                calorieTracker.addMacros(12, 0, 0, 70);
+            }
+            updateCalorieLabels(calorieTracker, proteinLabel, carbsLabel, fatsLabel, caloriesLabel);
+        });
+
+        carbsDropdown.addActionListener(e -> {
+            String selectedItem = (String) carbsDropdown.getSelectedItem();
+            if (selectedItem.contains("Rice")) {
+                calorieTracker.addMacros(0, 40, 0, 200);
+            } else if (selectedItem.contains("Bread")) {
+                calorieTracker.addMacros(0, 20, 0, 120);
+            }
+            updateCalorieLabels(calorieTracker, proteinLabel, carbsLabel, fatsLabel, caloriesLabel);
+        });
+
+        snackDropdown.addActionListener(e -> {
+            String selectedItem = (String) snackDropdown.getSelectedItem();
+            if (selectedItem.contains("Chips")) {
+                calorieTracker.addMacros(0, 0, 10, 150);
+            } else if (selectedItem.contains("Chocolate")) {
+                calorieTracker.addMacros(0, 0, 15, 250);
+            }
+            updateCalorieLabels(calorieTracker, proteinLabel, carbsLabel, fatsLabel, caloriesLabel);
+        });
+
+        panel.add(proteinLabel);
+        panel.add(carbsLabel);
+        panel.add(fatsLabel);
+        panel.add(caloriesLabel);
+        panel.add(proteinDropdown);
+        panel.add(carbsDropdown);
+        panel.add(snackDropdown);
+
+        return panel;
+    }
+
+    private void updateCalorieLabels(CalorieTracker tracker, JLabel proteinLabel, JLabel carbsLabel, JLabel fatsLabel, JLabel caloriesLabel) {
+        proteinLabel.setText("Protein: " + tracker.getProtein() + "g");
+        carbsLabel.setText("Carbs: " + tracker.getCarbs() + "g");
+        fatsLabel.setText("Fats: " + tracker.getFats() + "g");
+        caloriesLabel.setText("Calories: " + tracker.getCaloriesConsumed());
+    }
+
     public JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length, int red, int green, int blue) {
         JButton button = new JButton(name);
         button.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
@@ -266,7 +460,7 @@ public class Main {
         comboBox.setFont(new Font("Arial", Font.PLAIN, font_size));
         comboBox.setBounds(xstart, ystart, width, length);
         comboBox.setOpaque(true);
-        comboBox.setBackground(new Color(63, 81, 181));
+        comboBox.setBackground(new Color(12, 200, 200));
         comboBox.setForeground(Color.WHITE);
         comboBox.setFocusable(false);
         return comboBox;
