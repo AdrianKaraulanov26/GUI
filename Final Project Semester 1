@@ -4,6 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import static java.lang.Double.parseDouble;
 
 class TimerPanel {
     private Timer timer;
@@ -123,22 +126,105 @@ class StopwatchPanel {
 class FitnessTracker {
     private int reps;
     private int sets;
-    private int caloriesBurned;
+    private double caloriesBurned;
     private int repsLimit;
-
-    public FitnessTracker() {
+    private String exercise;
+    private JLabel sets_label, reps_label, calories_label, main_label;
+    private JButton addRep, reset_tracker;
+    private JComboBox reps_in_set, exercises;
+    private String selectedExercise;
+    private double cals_pe = 1;
+    private String encouragement;
+    private JTextField calories_goal;
+    private double goal;
+    public FitnessTracker(JLabel sets_label, JLabel reps_label, JLabel calories_label, JButton addRep,JButton reset_tracker, JComboBox reps_in_set, JComboBox exercises, JLabel main_label, JTextField calories_goal) {
+        this.sets_label = sets_label;
+        this.reps_label = reps_label;
+        this.calories_label = calories_label;
+        this.addRep = addRep;
+        this.reps_in_set = reps_in_set;
+        this.exercises = exercises;
+        this.reset_tracker = reset_tracker;
         this.reps = 0;
         this.sets = 0;
         this.caloriesBurned = 0;
-        this.repsLimit = 10; // Default reps limit
-    }
+        this.repsLimit = 10;
+        this.main_label = main_label;
+        this.calories_goal = calories_goal;
+        parseCalorieGoal();
+        addRep.addActionListener(e -> {
+            incrementReps(cals_pe);
+            sets_label.setText("Sets: " + getSets());
+            reps_label.setText("Reps: " + getReps());
+            calories_label.setText("Calories: " + getCaloriesBurned());
+            parseCalorieGoal();
+        });
+        reps_in_set.addActionListener(e -> {
+            String selectedRegime = (String) reps_in_set.getSelectedItem();
+            setRepsLimit(Integer.parseInt(selectedRegime));
+        });
+        exercises.addActionListener(e -> {
+             selectedExercise = (String) exercises.getSelectedItem();
+             chooseExercise();
+        });
+        reset_tracker.addActionListener(e ->{
+            resetTracker();
+            sets_label.setText("Sets: 0");
+            reps_label.setText("Reps: 0");
+            calories_label.setText("Calories: 0");
+        });
 
-    public void incrementReps(int caloriesPerRep) {
+    }
+    private void parseCalorieGoal() {
+        try {
+            goal = Double.parseDouble(calories_goal.getText());
+        } catch (NumberFormatException e) {
+            goal = 0;
+        }
+    }
+    public void chooseExercise(){
+        switch (selectedExercise){
+            case "Squats":
+                cals_pe = 2.5;
+            break;
+            case "Push-ups":
+                cals_pe = 2;
+            break;
+            case "Pull-ups":
+                cals_pe = 3;
+            break;
+            case "Dips":
+                cals_pe = 3;
+            break;
+            case "Bench-press":
+                cals_pe = 4;
+            break;
+            default:
+                cals_pe = 2;
+        }
+    }
+    public String choose_encouragement(){
+        int courage = (int) Math.floor(Math.random()*5);
+        if(goal<caloriesBurned){
+            return encouragement = "You did it Buddy, you can rest today!";
+        }
+        return switch (courage) {
+            case 1 -> encouragement = "Doing great!";
+            case 2 -> encouragement = "Light work buddy!";
+            case 3 -> encouragement = "Another set young one";
+            case 4 -> encouragement = "Those calories ain't burning themselves";
+            case 5 -> encouragement = "Sacrifice yourself for the gain";
+            default -> encouragement = "Let's get going!";
+        };
+
+    }
+    public void incrementReps(double calories) {
         reps++;
-        caloriesBurned += caloriesPerRep;
+        caloriesBurned += calories;
         if (reps >= repsLimit) {
             reps = 0;
             sets++;
+            main_label.setText(choose_encouragement());
         }
     }
 
@@ -154,7 +240,7 @@ class FitnessTracker {
         return sets;
     }
 
-    public int getCaloriesBurned() {
+    public double getCaloriesBurned() {
         return caloriesBurned;
     }
 
@@ -162,6 +248,9 @@ class FitnessTracker {
         this.reps = 0;
         this.sets = 0;
         this.caloriesBurned = 0;
+        goal = 0;
+        main_label.setText("Select a calorie goal and let's train!");
+        calories_goal.setText("Calorie goal");
     }
 }
 class CalorieTracker {
@@ -212,11 +301,11 @@ public class Main {
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MalformedURLException {
         new Main().createGUI();
     }
     // the GUI is the main component of the Main class, since the cardLayout and JPanels have to bo defined for the entire class, not individual methods
-    public void createGUI() {
+    public void createGUI() throws MalformedURLException {
         frame = new JFrame("Phone Clock App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(2040, 1160);
@@ -337,36 +426,43 @@ public class Main {
         return panel2;
     }
 
-    public JPanel createFitnessTrackerPanel() {
+    public JPanel createFitnessTrackerPanel() throws MalformedURLException {
         JPanel panel = createPanel("Fitness Tracker", 3);
 
-        JLabel setsLabel = Create_label("Sets: 0", 50, 50, 200, 300, 100);
-        JLabel repsLabel = Create_label("Reps: 0", 50, 50, 320, 300, 100);
-        JLabel caloriesLabel = Create_label("Calories: 0", 50, 50, 440, 300, 100);
-
-        JButton repButton = Create_button("Add Rep", 40, 400, 200, 400, 100, 50, 200, 50);
-        JComboBox<String> regimeSelector = Create_combobox(new String[]{"6", "8", "10", "12", "14"}, 30, 50, 560, 300, 80);
-
-        FitnessTracker fitnessTracker = new FitnessTracker();
-
-        repButton.addActionListener(e -> {
-            fitnessTracker.incrementReps(5); // Assuming 5 calories per rep
-            setsLabel.setText("Sets: " + fitnessTracker.getSets());
-            repsLabel.setText("Reps: " + fitnessTracker.getReps());
-            caloriesLabel.setText("Calories: " + fitnessTracker.getCaloriesBurned());
-        });
-
-        regimeSelector.addActionListener(e -> {
-            String selectedRegime = (String) regimeSelector.getSelectedItem();
-            fitnessTracker.setRepsLimit(Integer.parseInt(selectedRegime));
-        });
+        JLabel setsLabel = Create_label("Sets: 0", 50, 50, 300, 500, 100);
+        JLabel repsLabel = Create_label("Reps: 0", 50, 50, 425, 500, 100);
+        JLabel caloriesLabel = Create_label("Calories: 0", 50, 50, 550, 500, 100);
+        JLabel main_label = Create_label("Select a calorie goal and let's train!", 80, 300, 100, 1400, 150);
+        JButton repButton = Create_button("Add Rep", 50, 50, 675, 400, 100, 50, 200, 50);
+        JButton resetTracker = Create_button("Reset", 50, 50, 800, 400, 100, 50, 200, 50);
+        JComboBox<String> regimeSelector = Create_combobox(new String[]{"Reps in a set","6", "8", "10", "12", "14"}, 50, 650, 300, 500, 100);
+        URL ronnieURL = new URL("https://media3.giphy.com/media/nIDFKbfyUx68r7bTEb/giphy.gif?cid=6c09b952jngtv4p9xmotgj69lcojhre3ccz7gwnb7aades4h&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=s");
+        JTextField calorie_goal = new JTextField("Calorie Goal");
+        calorie_goal.setBounds(650,550,500,100);
+        calorie_goal.setFont(new Font("Arial", Font.HANGING_BASELINE, 50));
+        calorie_goal.setOpaque(true);
+        calorie_goal.setBackground(new Color(63, 81, 181));
+        calorie_goal.setForeground(Color.WHITE);
+        ImageIcon ronnieIcon = new ImageIcon(ronnieURL);
+        JButton ronnieButton = Create_button("Ronnie Coleman", 40, 1200, 150, 850, 700, 50, 200, 50);
+        ronnieButton.setIcon(ronnieIcon);
+        ronnieButton.setBorderPainted(false);
+        ronnieButton.setContentAreaFilled(false);
+        ronnieButton.setOpaque(false);
+        ronnieButton.setForeground(Color.YELLOW);
+        JComboBox<String> exercises = Create_combobox(new String[]{"Exercise","Squats", "Push-ups", "Pull-ups", "Dips", "Bench-press"}, 50, 650, 425, 500, 100);
+        FitnessTracker fitnessTracker = new FitnessTracker(setsLabel, repsLabel, caloriesLabel ,repButton,resetTracker,regimeSelector,exercises, main_label, calorie_goal);
 
         panel.add(setsLabel);
         panel.add(repsLabel);
         panel.add(caloriesLabel);
         panel.add(repButton);
         panel.add(regimeSelector);
-
+        panel.add(resetTracker);
+        panel.add(exercises);
+        panel.add(main_label);
+        panel.add(ronnieButton);
+        panel.add(calorie_goal);
         return panel;
     }
 
