@@ -4,9 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import static java.lang.Double.parseDouble;
 
 class TimerPanel {
     private Timer timer;
@@ -182,6 +179,7 @@ class FitnessTracker {
             goal = 0;
         }
     }
+
     public void chooseExercise(){
         switch (selectedExercise){
             case "Squats":
@@ -258,14 +256,115 @@ class CalorieTracker {
     private int protein;
     private int carbs;
     private int fats;
-
-    public CalorieTracker() {
+    private JLabel protein_label, carbs_label, fats_label, calories_label, main_label;
+    private JComboBox protein_dropdown, carbs_dropdown, snacks_dropdown, drinks_dropdown;
+    private JTextField limiter;
+    private JButton reset;
+    private String encouragement;
+    private int limit;
+    private Timer timer;
+    public CalorieTracker(JLabel protein_label, JLabel carbs_label, JLabel fats_label, JLabel calories_label, JComboBox protein_dropdown, JComboBox carbs_dropdown, JComboBox snacks_dropdown, JComboBox drinks_dropdown, JButton reset, JLabel main_label, JTextField limiter) {
+        this.protein_label = protein_label;
+        this.calories_label =calories_label;
+        this.fats_label = fats_label;
+        this.carbs_label = carbs_label;
+        this.protein_dropdown = protein_dropdown;
+        this.carbs_dropdown = carbs_dropdown;
+        this.snacks_dropdown = snacks_dropdown;
+        this.drinks_dropdown = drinks_dropdown;
+        this.reset = reset;
+        this.limiter = limiter;
         this.caloriesConsumed = 0;
         this.protein = 0;
         this.carbs = 0;
         this.fats = 0;
+        timer = new Timer(10000, e -> main_label.setText(choose_encouragement()));
+        timer.start();
+        protein_dropdown.addActionListener(e -> {
+            extract_protein();
+            updateLabels();
+        });
+        carbs_dropdown.addActionListener(e -> {
+            extract_carbs();
+            updateLabels();
+        });
+        snacks_dropdown.addActionListener(e -> {
+            extract_snacks();
+            updateLabels();
+        });
+        drinks_dropdown.addActionListener(e ->{
+            extract_drinks();
+            updateLabels();
+        });
+        reset.addActionListener(e -> {
+            resetTracker();
+        });
     }
+    private String choose_encouragement(){
+        int courage = (int) Math.floor(Math.random()*5);
+        limit = Integer.parseInt(limiter.getText());
+        if(limit<getCaloriesConsumed()){
+            return encouragement = "You have reached your calorie limit!";
+        }
+        return switch (courage) {
+            case 1 -> encouragement = "Doing great!";
+            case 2 -> encouragement = "Gains are mage in the kitchen!";
+            case 3 -> encouragement = "Eating is building";
+            case 4 -> encouragement = "Bodybuilders eat a lot, don't be afraid!";
+            case 5 -> encouragement = "Calories are made to be consumed";
+            default -> encouragement = "TERMINATOR";
+        };
 
+    }
+    private void extract_protein(){
+        String selectedItem = (String) protein_dropdown.getSelectedItem();
+        switch (selectedItem){
+            case String s when s.contains("Chicken") -> {addMacros(31, 0, 4, 165);}
+            case String s when s.contains("Eggs") -> {addMacros(13,1,11,155);}
+            case String s when s.contains("Beef") -> {addMacros(26,0,17,250);}
+            case String s when s.contains("Salmon") -> {addMacros(22,0,16,206);}
+            case String s when s.contains("Pork") -> {addMacros(26,0,4,143);}
+            case String s when s.contains("Shrimp") -> {addMacros(24,0,1,99);}
+            case String s when s.contains("Tofu") -> {addMacros(15,0,9,144);}
+            default -> {addMacros(0,0,0,0);}
+        }
+    }
+    private void extract_carbs(){
+        String selectedItem = (String) carbs_dropdown.getSelectedItem();
+        switch (selectedItem){
+            case String s when s.contains("Rice") -> {addMacros(0, 28, 0, 130);}
+            case String s when s.contains("Bread") -> {addMacros(0,49,0,219);}
+            case String s when s.contains("Pasta") -> {addMacros(0,25,0,120);}
+            case String s when s.contains("Potatoes") -> {addMacros(0,37,0,90);}
+            case String s when s.contains("Quinoa") -> {addMacros(0,21,0,120);}
+            case String s when s.contains("Fries") -> {addMacros(0,37,15,311);}
+            default -> {addMacros(0,0,0,0);}
+        }
+    }
+    private void extract_snacks(){
+        String selectedItem = (String) snacks_dropdown.getSelectedItem();
+        switch (selectedItem){
+            case String s when s.contains("Apple") -> {addMacros(0, 25, 0, 95);}
+            case String s when s.contains("Banana") -> {addMacros(0, 27, 0, 105);}
+            case String s when s.contains("Granola Bar") -> {addMacros(0, 22, 10, 150);}
+            case String s when s.contains("Chips") -> {addMacros(0, 15, 10, 150);}
+            case String s when s.contains("Popcorn") -> {addMacros(0, 18, 0, 90);}
+            case String s when s.contains("Chocolate") -> {addMacros(0, 15, 10, 150);}
+            default -> {addMacros(0,0,0,0);}
+        }
+    }
+    private void extract_drinks(){
+        String selectedItem = (String) drinks_dropdown.getSelectedItem();
+        switch (selectedItem){
+            case String s when s.contains("Soda") -> {addMacros(0, 39, 0, 150);}
+            case String s when s.contains("Orange Juice") -> {addMacros(0, 26, 0, 110);}
+            case String s when s.contains("Milk") -> {addMacros(0, 12, 0, 150);}
+            case String s when s.contains("Beer") -> {addMacros(0, 13, 0, 150);}
+            case String s when s.contains("Coffee") -> {addMacros(0, 0, 0, 2);}
+            case String s when s.contains("Tea") -> {addMacros(0, 0, 0, 2);}
+            default -> {addMacros(0,0,0,0);}
+        }
+    }
     public void addMacros(int protein, int carbs, int fats, int calories) {
         this.protein += protein;
         this.carbs += carbs;
@@ -273,28 +372,36 @@ class CalorieTracker {
         this.caloriesConsumed += calories;
     }
 
-    public int getProtein() {
+    private int getProtein() {
         return protein;
     }
 
-    public int getCarbs() {
+    private int getCarbs() {
         return carbs;
     }
 
-    public int getFats() {
+    private int getFats() {
         return fats;
     }
 
-    public int getCaloriesConsumed() {
+    private int getCaloriesConsumed() {
         return caloriesConsumed;
     }
 
-    public void resetTracker() {
+    private void resetTracker() {
         this.caloriesConsumed = 0;
         this.protein = 0;
         this.carbs = 0;
         this.fats = 0;
+        updateLabels();
     }
+    private void updateLabels(){
+        protein_label.setText("Protein: " + getProtein() + "g");
+        fats_label.setText("Fats: " + getFats()+ "g") ;
+        carbs_label.setText("Carbs: " + getCarbs() + "g");
+        calories_label.setText("Calories: " + getCaloriesConsumed());
+    }
+
 }
 public class Main {
     private JFrame frame;
@@ -466,49 +573,73 @@ public class Main {
         return panel;
     }
 
-    public JPanel createCalorieTrackerPanel() {
+    public JPanel createCalorieTrackerPanel() throws MalformedURLException {
         JPanel panel = createPanel("Calorie Counter", 4);
 
-        JLabel proteinLabel = Create_label("Protein: 0g", 40, 50, 200, 300, 80);
-        JLabel carbsLabel = Create_label("Carbs: 0g", 40, 50, 300, 300, 80);
-        JLabel fatsLabel = Create_label("Fats: 0g", 40, 50, 400, 300, 80);
-        JLabel caloriesLabel = Create_label("Calories: 0", 40, 50, 500, 300, 80);
+        JLabel proteinLabel = Create_label("Protein: 0g", 40, 50, 400, 300, 80);
+        JLabel carbsLabel = Create_label("Carbs: 0g", 40, 50, 500, 300, 80);
+        JLabel fatsLabel = Create_label("Fats: 0g", 40, 50, 600, 300, 80);
+        JLabel caloriesLabel = Create_label("Calories: 0", 40, 50, 700, 300, 80);
+        JLabel main_label = Create_label("Set a calorie limit and build gains", 80, 300, 100, 1400, 150);
+        JTextField limiter = new JTextField("Calorie limit");
+        limiter.setBounds(400, 800, 600, 100);
+        limiter.setFont(new Font("Arial", Font.HANGING_BASELINE, 50));
+        limiter.setOpaque(true);
+        limiter.setBackground(new Color(63, 81, 181));
+        limiter.setForeground(Color.WHITE);
+        URL arnoldURL = new URL("https://www.pngplay.com/wp-content/uploads/6/Arnold-Schwarzenegger-Shirtless-PNG.png");
+        ImageIcon arnoldIcon = new ImageIcon(arnoldURL);
+        JButton arnoldButton = Create_button("Arnold", 40, 1200, 150, 800, 1000, 50, 200, 50);
+        arnoldButton.setIcon(arnoldIcon);
+        arnoldButton.setBorderPainted(false);
+        arnoldButton.setContentAreaFilled(false);
+        arnoldButton.setOpaque(false);
+        arnoldButton.setForeground(Color.YELLOW);
+        JButton reset = Create_button("Reset", 50, 50, 800, 300,80, 90,255,90);
+        String[] proteins = {
+                "Common proteins per 100g",
+                "Chicken - 31g protein, 165 cal, 4g fat",
+                "Eggs - 13g protein, 155 cal, 11g fat, 1g carbs",
+                "Beef - 26g protein, 250 cal, 17g fat",
+                "Salmon - 22g protein, 206 cal, 16g fat",
+                "Pork - 26g protein, 143 cal, 4g fat",
+                "Shrimp - 24g protein, 99 cal, 1g fat",
+                "Tofu - 15g protein, 144 cal, 9g fat",
+                "Chickpeas - 9g protein, 164 cal, 3g fat"
+        };
+        String[] carbs = {
+                "Common carbs per 100g",
+                "Rice - 28g carbs, 130 cal",
+                "Bread - 49g carbs, 219 cal",
+                "Pasta - 25g carbs, 120 cal",
+                "Potatoes - 37g carbs, 90 cal",
+                "Quinoa - 21g carbs, 120 cal",
+                "Fries - 37g carbs, 311 cal, 15g fat"
+        };
+        String[] snacks = {
+                "Common snacks per serving size",
+                "Apple - 25g carbs, 95 cal",
+                "Banana - 27g carbs, 105 cal",
+                "Granola Bar - 22g carbs, 150 cal",
+                "Chips - 15g carbs, 150 cal",
+                "Popcorn - 18g carbs, 90 cal",
+                "Chocolate - 15g carbs, 150 cal, 10g fat"
+        };
+        String[] drinks = {
+                "Common drinks",
+                "Soda 355ml - 39g carbs, 140 cal",
+                "Orange Juice 250ml - 26g carbs, 110 cal",
+                "Milk 250ml - 12g carbs, 150 cal",
+                "Beer 355ml - 13g carbs, 150 cal",
+                "Coffee unsweetened - 0g carbs, 2 cal",
+                "Tea unsweetened - 0g carbs, 2 cal"
+        };
+        JComboBox<String> proteinDropdown = Create_combobox(proteins, 50, 400, 300, 600, 100);
+        JComboBox<String> carbsDropdown = Create_combobox(carbs, 50, 400, 425, 600, 100);
+        JComboBox<String> snackDropdown = Create_combobox(snacks, 50, 400, 550, 600, 100);
+        JComboBox<String> drinksDropdown = Create_combobox(drinks, 50, 400, 675, 600, 100);
 
-        JComboBox<String> proteinDropdown = Create_combobox(new String[]{"Chicken - 30g protein, 150 cal", "Eggs - 12g protein, 70 cal"}, 25, 400, 200, 600, 50);
-        JComboBox<String> carbsDropdown = Create_combobox(new String[]{"Rice - 40g carbs, 200 cal", "Bread - 20g carbs, 120 cal"}, 25, 400, 300, 600, 50);
-        JComboBox<String> snackDropdown = Create_combobox(new String[]{"Chips - 10g fat, 150 cal", "Chocolate - 15g fat, 250 cal"}, 25, 400, 400, 600, 50);
-
-        CalorieTracker calorieTracker = new CalorieTracker();
-
-        proteinDropdown.addActionListener(e -> {
-            String selectedItem = (String) proteinDropdown.getSelectedItem();
-            if (selectedItem.contains("Chicken")) {
-                calorieTracker.addMacros(30, 0, 0, 150);
-            } else if (selectedItem.contains("Eggs")) {
-                calorieTracker.addMacros(12, 0, 0, 70);
-            }
-            updateCalorieLabels(calorieTracker, proteinLabel, carbsLabel, fatsLabel, caloriesLabel);
-        });
-
-        carbsDropdown.addActionListener(e -> {
-            String selectedItem = (String) carbsDropdown.getSelectedItem();
-            if (selectedItem.contains("Rice")) {
-                calorieTracker.addMacros(0, 40, 0, 200);
-            } else if (selectedItem.contains("Bread")) {
-                calorieTracker.addMacros(0, 20, 0, 120);
-            }
-            updateCalorieLabels(calorieTracker, proteinLabel, carbsLabel, fatsLabel, caloriesLabel);
-        });
-
-        snackDropdown.addActionListener(e -> {
-            String selectedItem = (String) snackDropdown.getSelectedItem();
-            if (selectedItem.contains("Chips")) {
-                calorieTracker.addMacros(0, 0, 10, 150);
-            } else if (selectedItem.contains("Chocolate")) {
-                calorieTracker.addMacros(0, 0, 15, 250);
-            }
-            updateCalorieLabels(calorieTracker, proteinLabel, carbsLabel, fatsLabel, caloriesLabel);
-        });
+        CalorieTracker calorieTracker = new CalorieTracker(proteinLabel, carbsLabel, fatsLabel, caloriesLabel, proteinDropdown, carbsDropdown, snackDropdown, drinksDropdown, reset, main_label, limiter);
 
         panel.add(proteinLabel);
         panel.add(carbsLabel);
@@ -517,15 +648,12 @@ public class Main {
         panel.add(proteinDropdown);
         panel.add(carbsDropdown);
         panel.add(snackDropdown);
-
+        panel.add(drinksDropdown);
+        panel.add(reset);
+        panel.add(main_label);
+        panel.add(limiter);
+        panel.add(arnoldButton);
         return panel;
-    }
-
-    private void updateCalorieLabels(CalorieTracker tracker, JLabel proteinLabel, JLabel carbsLabel, JLabel fatsLabel, JLabel caloriesLabel) {
-        proteinLabel.setText("Protein: " + tracker.getProtein() + "g");
-        carbsLabel.setText("Carbs: " + tracker.getCarbs() + "g");
-        fatsLabel.setText("Fats: " + tracker.getFats() + "g");
-        caloriesLabel.setText("Calories: " + tracker.getCaloriesConsumed());
     }
 
     public JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length, int red, int green, int blue) {
