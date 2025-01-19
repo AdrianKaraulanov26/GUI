@@ -4,6 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Random;
+
 
 class TimerPanel {
     private Timer timer;
@@ -161,8 +164,8 @@ class FitnessTracker {
             setRepsLimit(Integer.parseInt(selectedRegime));
         });
         exercises.addActionListener(e -> {
-             selectedExercise = (String) exercises.getSelectedItem();
-             chooseExercise();
+            selectedExercise = (String) exercises.getSelectedItem();
+            chooseExercise();
         });
         reset_tracker.addActionListener(e ->{
             resetTracker();
@@ -184,19 +187,19 @@ class FitnessTracker {
         switch (selectedExercise){
             case "Squats":
                 cals_pe = 2.5;
-            break;
+                break;
             case "Push-ups":
                 cals_pe = 2;
-            break;
+                break;
             case "Pull-ups":
                 cals_pe = 3;
-            break;
+                break;
             case "Dips":
                 cals_pe = 3;
-            break;
+                break;
             case "Bench-press":
                 cals_pe = 4;
-            break;
+                break;
             default:
                 cals_pe = 2;
         }
@@ -300,21 +303,37 @@ class CalorieTracker {
             resetTracker();
         });
     }
-    private String choose_encouragement(){
-        int courage = (int) Math.floor(Math.random()*5);
+    private String choose_encouragement() {
+        int courage = (int) Math.floor(Math.random() * 20) + 1;
         limit = Integer.parseInt(limiter.getText());
-        if(limit<getCaloriesConsumed()){
-            return encouragement = "You have reached your calorie limit!";
-        }
-        return switch (courage) {
-            case 1 -> encouragement = "Doing great!";
-            case 2 -> encouragement = "Gains are mage in the kitchen!";
-            case 3 -> encouragement = "Eating is building";
-            case 4 -> encouragement = "Bodybuilders eat a lot, don't be afraid!";
-            case 5 -> encouragement = "Calories are made to be consumed";
-            default -> encouragement = "TERMINATOR";
-        };
 
+        if (limit < getCaloriesConsumed()) {
+            return "You have reached your calorie limit!";
+        }
+
+        return switch (courage) {
+            case 1 -> "Doing great!";
+            case 2 -> "Gains are made in the kitchen!";
+            case 3 -> "Eating is building.";
+            case 4 -> "Bodybuilders eat a lot, don't be afraid!";
+            case 5 -> "Calories are made to be consumed!";
+            case 6 -> "Your body is your temple, feed it well!";
+            case 7 -> "Progress comes with every bite!";
+            case 8 -> "Stronger with every meal!";
+            case 9 -> "Building muscle, one calorie at a time!";
+            case 10 -> "You're fueling your gains!";
+            case 11 -> "Keep eating, keep growing!";
+            case 12 -> "Food is fuel, keep going!";
+            case 13 -> "Your body is a machine, feed it!";
+            case 14 -> "A good workout starts with good nutrition!";
+            case 15 -> "Nourishment is the first step to greatness!";
+            case 16 -> "You're one step closer to your goals!";
+            case 17 -> "Fuel your ambition!";
+            case 18 -> "Gains don't happen overnight!";
+            case 19 -> "Keep up the good work, the results will come!";
+            case 20 -> "Every calorie counts towards your goal!";
+            default -> "TERMINATOR";
+        };
     }
     private void extract_protein(){
         String selectedItem = (String) protein_dropdown.getSelectedItem();
@@ -403,6 +422,85 @@ class CalorieTracker {
     }
 
 }
+class Bankai extends JPanel implements ActionListener {
+    private static final int PANEL_WIDTH = 2000;
+    private static final int PANEL_HEIGHT = 1200;
+    private static final int TIMER_DELAY = 16; // ~60 FPS
+
+    private final int numPetals;
+    private final ArrayList<Petals> petals = new ArrayList<>();
+    private final Timer timer;
+    private Image byakuyaImage;
+
+    public Bankai(String imageUrl, int numPetals) throws MalformedURLException {
+        this.numPetals = numPetals;
+        setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+        setBackground(Color.BLACK);
+
+        URL byakuyaUrl = new URL(imageUrl);
+        byakuyaImage = new ImageIcon(byakuyaUrl).getImage();
+
+        initPetals();
+
+        timer = new Timer(TIMER_DELAY, this);
+        timer.start();
+    }
+
+    private void initPetals() {
+        Random random = new Random();
+        for (int i = 0; i < numPetals; i++) {
+            double angle = random.nextDouble() * 2 * Math.PI;
+            double radius = random.nextDouble() * 800 + 320;
+            petals.add(new Petals(PANEL_WIDTH / 2, PANEL_HEIGHT / 2, angle, radius));
+        }
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        int imgWidth = byakuyaImage.getWidth(null) / 2;
+        int imgHeight = byakuyaImage.getHeight(null) / 2;
+        g2d.drawImage(byakuyaImage, (PANEL_WIDTH - imgWidth-60) / 2, (PANEL_HEIGHT - imgHeight) / 2, imgWidth, imgHeight, null);
+
+        for (Petals petal : petals) {
+            petal.draw(g2d);
+        }
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        for (Petals petal : petals) {
+            petal.update();
+        }
+        repaint();
+    }
+
+    class Petals {
+        private double centerX, centerY;
+        private double angle, radius;
+        private double speed;
+        private final Color color;
+
+        public Petals(double centerX, double centerY, double angle, double radius) {
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.angle = angle;
+            this.radius = radius;
+            this.speed = 0.02 + Math.random() * 0.03; // Random speed
+            this.color = new Color(255, 182, 193, 150); // Soft pink with transparency
+        }
+
+        public void update() {
+            angle += speed;
+        }
+
+        public void draw(Graphics2D g2d) {
+            double x = centerX + Math.cos(angle) * radius;
+            double y = centerY + Math.sin(angle) * radius;
+            g2d.setColor(color);
+            g2d.fillOval((int) x - 5, (int) y - 5, 20, 10);
+        }
+    }
+}
 public class Main {
     private JFrame frame;
     private CardLayout cardLayout;
@@ -426,7 +524,7 @@ public class Main {
         JPanel panel2 = createStopwatchPanel();
         JPanel panel3 = createFitnessTrackerPanel();
         JPanel panel4 = createCalorieTrackerPanel();
-        JPanel panel5 = createPanel("Dino game", 5);
+        JPanel panel5 = createBankai();
         JPanel panel6 = createPanel("Click Counter", 6);
 
         mainPanel.add(mainMenuPanel, "MainMenu");
@@ -455,7 +553,7 @@ public class Main {
                     new URL("https://cdn-icons-png.flaticon.com/512/3003/3003202.png"), // Local file paths use "file:///" prefix
                     new URL("https://cdn-icons-png.flaticon.com/512/6750/6750831.png"), // Replace spaces with "%20"
                     new URL("https://cdn-icons-png.flaticon.com/512/2058/2058065.png"),
-                    new URL("https://cdn-icons-png.flaticon.com/512/8337/8337182.png"),
+                    new URL("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/062e5e10-0d29-4a44-941a-de4fad7ab823/d7j5cbh-92f99e6f-234b-493e-ab79-30af027a0fcc.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzA2MmU1ZTEwLTBkMjktNGE0NC05NDFhLWRlNGZhZDdhYjgyM1wvZDdqNWNiaC05MmY5OWU2Zi0yMzRiLTQ5M2UtYWI3OS0zMGFmMDI3YTBmY2MucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.PtspoHaaQuRZfHvCk_2FIK8AbrPYRS5QKyxkSpHj6d4"),
                     new URL("https://cdn-icons-png.flaticon.com/512/614/614180.png")
             };
         } catch (MalformedURLException e) {
@@ -589,7 +687,7 @@ public class Main {
         limiter.setForeground(Color.WHITE);
         URL arnoldURL = new URL("https://www.pngplay.com/wp-content/uploads/6/Arnold-Schwarzenegger-Shirtless-PNG.png");
         ImageIcon arnoldIcon = new ImageIcon(arnoldURL);
-        JButton arnoldButton = Create_button("Arnold", 40, 1200, 150, 800, 1000, 50, 200, 50);
+        JButton arnoldButton = Create_button("Arnold", 40, 1200, 270, 800, 900, 50, 200, 50);
         arnoldButton.setIcon(arnoldIcon);
         arnoldButton.setBorderPainted(false);
         arnoldButton.setContentAreaFilled(false);
@@ -634,10 +732,10 @@ public class Main {
                 "Coffee unsweetened - 0g carbs, 2 cal",
                 "Tea unsweetened - 0g carbs, 2 cal"
         };
-        JComboBox<String> proteinDropdown = Create_combobox(proteins, 50, 400, 300, 600, 100);
-        JComboBox<String> carbsDropdown = Create_combobox(carbs, 50, 400, 425, 600, 100);
-        JComboBox<String> snackDropdown = Create_combobox(snacks, 50, 400, 550, 600, 100);
-        JComboBox<String> drinksDropdown = Create_combobox(drinks, 50, 400, 675, 600, 100);
+        JComboBox<String> proteinDropdown = Create_combobox(proteins, 30, 400, 300, 600, 100);
+        JComboBox<String> carbsDropdown = Create_combobox(carbs, 30, 400, 425, 600, 100);
+        JComboBox<String> snackDropdown = Create_combobox(snacks, 30, 400, 550, 600, 100);
+        JComboBox<String> drinksDropdown = Create_combobox(drinks, 30, 400, 675, 600, 100);
 
         CalorieTracker calorieTracker = new CalorieTracker(proteinLabel, carbsLabel, fatsLabel, caloriesLabel, proteinDropdown, carbsDropdown, snackDropdown, drinksDropdown, reset, main_label, limiter);
 
@@ -653,6 +751,36 @@ public class Main {
         panel.add(main_label);
         panel.add(limiter);
         panel.add(arnoldButton);
+        return panel;
+    }
+
+    public JPanel createBankai() throws MalformedURLException {
+        Bankai bankai = new Bankai("https://static.wikia.nocookie.net/all-worlds-alliance/images/0/0e/Byakuya_kuchiki_render_2_by_slenderwood_dab0fgm-pre.png/revision/latest?cb=20190226022706", 1500);
+        JButton returnButton = new JButton("Return to Main Menu");
+        returnButton.setFont(new Font("Arial", Font.HANGING_BASELINE, 60));
+        returnButton.setBackground(Color.BLACK);
+        returnButton.setForeground(Color.WHITE);
+        returnButton.setBounds(0, 1000, 2000, 100);
+        returnButton.setFocusPainted(false);
+
+        returnButton.addActionListener(e -> {
+            cardLayout.show(mainPanel, "MainMenu");
+        });
+        JLabel taskLabel = new JLabel("Bankai: Senbonzakura Kageyoshi");
+        taskLabel.setFont(new Font("Arial", Font.HANGING_BASELINE, 80));
+        taskLabel.setBackground(Color.BLACK);
+        taskLabel.setOpaque(true);
+        taskLabel.setForeground(Color.WHITE);
+        taskLabel.setBounds(0, 0, 2000, 100);
+        taskLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        panel.add(bankai, BorderLayout.CENTER);
+        panel.add(taskLabel, BorderLayout.NORTH);
+        panel.add(returnButton, BorderLayout.SOUTH);
+        bankai.setOpaque(false);
+        panel.setBackground(Color.BLACK);
         return panel;
     }
 
@@ -698,7 +826,7 @@ public class Main {
         returnButton.setFont(new Font("Arial", Font.HANGING_BASELINE, 60));
         returnButton.setBackground(new Color(255, 255, 255));
         returnButton.setForeground(Color.BLACK);
-        returnButton.setBounds(0, 1000, 2000, 100);
+        returnButton.setBounds(0, 1000, 2000, 150);
         returnButton.setFocusPainted(false);
 
         returnButton.addActionListener(e -> {
