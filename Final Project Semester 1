@@ -454,7 +454,7 @@ class Bankai extends JPanel implements ActionListener {
         }
     }
 
-    public void paintComponent(Graphics g) {
+    public void paintComponent(Graphics g) { // I used this tutorial gor the 2d graphics https://www.youtube.com/watch?v=KcEvHq8Pqs0
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         int imgWidth = byakuyaImage.getWidth(null) / 2;
@@ -515,18 +515,20 @@ class CookieClicker{
     private int mines;
     private int factories;
     private int banks;
-    public CookieClicker(JButton cookie, JComboBox upgrades, JLabel cookies) {
+    public CookieClicker(JButton cookie, JComboBox upgrades, JLabel cookies, JTextField name) {
         this.cookie = cookie;
         this.upgrades = upgrades;
         this.cookies = cookies;
+        this.name = name;
         this.timer = new Timer(1000, e -> update());
         this.timer.start();
 
         upgrades.addActionListener(e -> BuyUpgrade());
         cookie.addActionListener(e -> {
-            num_cookies += 1+ rate_cookies;
+            num_cookies += 5+ rate_cookies;
             cookies.setText("Cookies: " + num_cookies);
         });
+
     }
     void update(){
         num_cookies+=rate_cookies;
@@ -536,38 +538,56 @@ class CookieClicker{
         upgrade_selected = (String) upgrades.getSelectedItem();
 
             switch (upgrade_selected){
-                case String s when s.contains("Cursor") -> {if(num_cookies >= (10 + (cursors * 5))){
-                    num_cookies -= (10 + (cursors * 5));
+                case String s when s.contains("Cursor") -> {if(num_cookies >= (50 + (cursors * 25))){
+                    num_cookies -= (50 + (cursors * 25));
                     cursors++;
-                    rate_cookies +=0.1;
+                    rate_cookies +=((double) 1/2);
                 }}
-                case String s when s.contains("Grandma") -> {if(num_cookies >= (100 + (cursors * 25))){
-                    num_cookies -= (100 + (grandmas * 25));
+                case String s when s.contains("Grandma") -> {if(num_cookies >= (500 + (grandmas * 125))){
+                    num_cookies -= (500 + (grandmas * 125));
                     grandmas++;
-                    rate_cookies +=1;
+                    rate_cookies +=5;
                 }}
-                case String s when s.contains("Farm") -> {if(num_cookies >= (1000 + (cursors * 150))){
-                    num_cookies -= (1000 + (farms * 150));
+                case String s when s.contains("Farm") -> {if(num_cookies >= (5000 + (farms * 750))){
+                    num_cookies -= (5000 + (farms * 750));
                     farms++;
-                    rate_cookies +=10;
+                    rate_cookies +=50;
                 }}
-                case String s when s.contains("Mine") -> {if(num_cookies >= (10000 + (cursors * 500))){
-                    num_cookies -= (10000 + (mines * 500));
+                case String s when s.contains("Mine") -> {if(num_cookies >= (50000 + (mines * 2500))){
+                    num_cookies -= (50000 + (mines * 2500));
                     mines++;
-                    rate_cookies +=100;
+                    rate_cookies +=500;
                 }}
-                case String s when s.contains("Factory") -> {if(num_cookies >= (100000 + (cursors * 3500))){
-                    num_cookies -= (100000 + (factories * 3500));
+                case String s when s.contains("Factory") -> {if(num_cookies >= (500000 + (factories * 17500))){
+                    num_cookies -= (500000 + (factories * 17500));
                     factories++;
-                    rate_cookies +=1000;
+                    rate_cookies +=5000;
                 }}
-                case String s when s.contains("Bank") -> {if(num_cookies >= (1000000 + (cursors * 15000))){
-                    num_cookies -= (1000000 + (banks * 15000));
+                case String s when s.contains("Bank") -> {if(num_cookies >= (5000000 + (banks * 75000))){
+                    num_cookies -= (5000000 + (banks * 75000));
                     banks++;
-                    rate_cookies += 10000;
+                    rate_cookies += 50000;
                 }}
                 default -> {}
         }
+    }
+    int returnCursor_price(){
+        return (50 + (cursors * 25));
+    }
+    int returnGrandma_price(){
+        return (500 + (grandmas * 125));
+    }
+    int returnFarm_price(){
+        return (50 + (cursors * 25));
+    }
+    int returnMine_price(){
+        return (500 + (grandmas * 125));
+    }
+    int returnFactory_price(){
+        return (50 + (cursors * 25));
+    }
+    int returnBank_price(){
+        return (500 + (grandmas * 125));
     }
 }
 public class Main {
@@ -856,11 +876,22 @@ public class Main {
     public JPanel createCookieClicker() throws MalformedURLException {
 
         JLabel cookies = Create_label("Cookies: ", 50, 250, 100, 1200, 100);
+        cookies.setBackground(Color.ORANGE);
         JButton cookie = Create_button("", 1, 100, 300, 500, 500, 0, 0, 0);
+        JTextField name = new JTextField("Account name");
+        name.setBounds(200, 830, 500, 100);
+        name.setFont(new Font("Arial", Font.HANGING_BASELINE, 50));
+        name.setOpaque(true);
+        name.setBackground(Color.ORANGE);
+        name.setForeground(Color.WHITE);
         String[] upgrades = {
                 "Upgrades","Cursor","Grandma","Farm","Mine","Factory","Bank"
         };
+
         JComboBox<String> upgrades_box = Create_combobox(upgrades,50, 800, 300,500,100);
+        CookieClicker clicker = new CookieClicker(cookie, upgrades_box, cookies, name);
+        String[] upgrades2 = {"Upgrades", "Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank"};
+        upgrades_box.setModel(upgrades2[]);
         URL cookie_url = new URL("https://cdn-icons-png.flaticon.com/512/614/614180.png");
         ImageIcon cookie_icon = new ImageIcon(cookie_url);
         cookie.setIcon(cookie_icon);
@@ -872,7 +903,7 @@ public class Main {
         panel.add(cookies);
         panel.add(cookie);
         panel.add(upgrades_box);
-        CookieClicker clicker = new CookieClicker(cookie, upgrades_box, cookies);
+        panel.add(name);
         return panel;
     }
 
