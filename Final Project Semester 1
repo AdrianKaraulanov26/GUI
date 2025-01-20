@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
-
 class TimerPanel {
     private Timer timer;
     private int timeLeft;
@@ -425,7 +424,7 @@ class CalorieTracker {
 class Bankai extends JPanel implements ActionListener {
     private static final int PANEL_WIDTH = 2000;
     private static final int PANEL_HEIGHT = 1200;
-    private static final int TIMER_DELAY = 16; // ~60 FPS
+    private static final int TIMER_DELAY = 16; // ~60 FPS IMPORTANT
 
     private final int numPetals;
     private final ArrayList<Petals> petals = new ArrayList<>();
@@ -486,18 +485,88 @@ class Bankai extends JPanel implements ActionListener {
             this.angle = angle;
             this.radius = radius;
             this.speed = 0.02 + Math.random() * 0.03; // Random speed
-            this.color = new Color(255, 182, 193, 150); // Soft pink with transparency
+            this.color = new Color(255, 182, 193, 200);
         }
 
         public void update() {
             angle += speed;
         }
 
-        public void draw(Graphics2D g2d) {
+        public void draw(Graphics2D petals) {
             double x = centerX + Math.cos(angle) * radius;
             double y = centerY + Math.sin(angle) * radius;
-            g2d.setColor(color);
-            g2d.fillOval((int) x - 5, (int) y - 5, 20, 10);
+            petals.setColor(color);
+            petals.fillOval((int) x - 10, (int) y - 5, 20, 10);
+        }
+    }
+}
+class CookieClicker{
+    private JButton cookie;
+    private JComboBox upgrades;
+    private JLabel cookies;
+    private JTextField name;
+    private Timer timer;
+    private double num_cookies;
+    private double rate_cookies;
+    String upgrade_selected;
+    private int cursors;
+    private int grandmas;
+    private int farms;
+    private int mines;
+    private int factories;
+    private int banks;
+    public CookieClicker(JButton cookie, JComboBox upgrades, JLabel cookies) {
+        this.cookie = cookie;
+        this.upgrades = upgrades;
+        this.cookies = cookies;
+        this.timer = new Timer(1000, e -> update());
+        this.timer.start();
+
+        upgrades.addActionListener(e -> BuyUpgrade());
+        cookie.addActionListener(e -> {
+            num_cookies += 1+ rate_cookies;
+            cookies.setText("Cookies: " + num_cookies);
+        });
+    }
+    void update(){
+        num_cookies+=rate_cookies;
+        cookies.setText("Cookies: " + num_cookies);
+    }
+    void BuyUpgrade(){
+        upgrade_selected = (String) upgrades.getSelectedItem();
+
+            switch (upgrade_selected){
+                case String s when s.contains("Cursor") -> {if(num_cookies >= (10 + (cursors * 5))){
+                    num_cookies -= (10 + (cursors * 5));
+                    cursors++;
+                    rate_cookies +=0.1;
+                }}
+                case String s when s.contains("Grandma") -> {if(num_cookies >= (100 + (cursors * 25))){
+                    num_cookies -= (100 + (grandmas * 25));
+                    grandmas++;
+                    rate_cookies +=1;
+                }}
+                case String s when s.contains("Farm") -> {if(num_cookies >= (1000 + (cursors * 150))){
+                    num_cookies -= (1000 + (farms * 150));
+                    farms++;
+                    rate_cookies +=10;
+                }}
+                case String s when s.contains("Mine") -> {if(num_cookies >= (10000 + (cursors * 500))){
+                    num_cookies -= (10000 + (mines * 500));
+                    mines++;
+                    rate_cookies +=100;
+                }}
+                case String s when s.contains("Factory") -> {if(num_cookies >= (100000 + (cursors * 3500))){
+                    num_cookies -= (100000 + (factories * 3500));
+                    factories++;
+                    rate_cookies +=1000;
+                }}
+                case String s when s.contains("Bank") -> {if(num_cookies >= (1000000 + (cursors * 15000))){
+                    num_cookies -= (1000000 + (banks * 15000));
+                    banks++;
+                    rate_cookies += 10000;
+                }}
+                default -> {}
         }
     }
 }
@@ -525,7 +594,7 @@ public class Main {
         JPanel panel3 = createFitnessTrackerPanel();
         JPanel panel4 = createCalorieTrackerPanel();
         JPanel panel5 = createBankai();
-        JPanel panel6 = createPanel("Click Counter", 6);
+        JPanel panel6 = createCookieClicker();
 
         mainPanel.add(mainMenuPanel, "MainMenu");
         mainPanel.add(countdownPanel, "Panel1");
@@ -678,7 +747,7 @@ public class Main {
         JLabel carbsLabel = Create_label("Carbs: 0g", 40, 50, 500, 300, 80);
         JLabel fatsLabel = Create_label("Fats: 0g", 40, 50, 600, 300, 80);
         JLabel caloriesLabel = Create_label("Calories: 0", 40, 50, 700, 300, 80);
-        JLabel main_label = Create_label("Set a calorie limit and build gains", 80, 300, 100, 1400, 150);
+        JLabel main_label = Create_label("Set a calorie limit and build gains", 65, 300, 100, 1400, 150);
         JTextField limiter = new JTextField("Calorie limit");
         limiter.setBounds(400, 800, 600, 100);
         limiter.setFont(new Font("Arial", Font.HANGING_BASELINE, 50));
@@ -781,6 +850,29 @@ public class Main {
         panel.add(returnButton, BorderLayout.SOUTH);
         bankai.setOpaque(false);
         panel.setBackground(Color.BLACK);
+        return panel;
+    }
+
+    public JPanel createCookieClicker() throws MalformedURLException {
+
+        JLabel cookies = Create_label("Cookies: ", 50, 250, 100, 1200, 100);
+        JButton cookie = Create_button("", 1, 100, 300, 500, 500, 0, 0, 0);
+        String[] upgrades = {
+                "Upgrades","Cursor","Grandma","Farm","Mine","Factory","Bank"
+        };
+        JComboBox<String> upgrades_box = Create_combobox(upgrades,50, 800, 300,500,100);
+        URL cookie_url = new URL("https://cdn-icons-png.flaticon.com/512/614/614180.png");
+        ImageIcon cookie_icon = new ImageIcon(cookie_url);
+        cookie.setIcon(cookie_icon);
+        cookie.setOpaque(false);
+        cookie.setBorderPainted(false);
+        cookie.setContentAreaFilled(false);
+        upgrades_box.setBackground(Color.ORANGE);
+        JPanel panel = createPanel("Cookie Clicker", 6);
+        panel.add(cookies);
+        panel.add(cookie);
+        panel.add(upgrades_box);
+        CookieClicker clicker = new CookieClicker(cookie, upgrades_box, cookies);
         return panel;
     }
 
