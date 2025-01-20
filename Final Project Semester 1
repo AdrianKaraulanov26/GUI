@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 class TimerPanel {
+    //variable initialization, same as always
     private Timer timer;
     private int timeLeft;
     private JLabel countdownLabel;
     private JButton startButton, stopButton, resetButton;
     private JComboBox<String> timeSelector;
-
+    // constructor, In most on my constructors I made the elements be initialized in the class and later be imported within the GUI initializer
     public TimerPanel(JLabel countdownLabel, JButton startButton, JButton stopButton, JButton resetButton, JComboBox<String> timeSelector) {
         this.countdownLabel = countdownLabel;
         this.startButton = startButton;
@@ -22,14 +23,14 @@ class TimerPanel {
         this.timeSelector = timeSelector;
         this.timeLeft = 0;
 
-        timer = new Timer(1000, e -> updateCountdown());
+        timer = new Timer(1000, e -> updateCountdown()); // all timers are made like this, because that's how Stack overflow taught me
 
-        startButton.addActionListener(e -> startCountdown());
+        startButton.addActionListener(e -> startCountdown()); // I like the shortened initialization, keeps my code more organized in less lines
         stopButton.addActionListener(e -> stopCountdown());
         resetButton.addActionListener(e -> resetCountdown());
     }
 
-    private void startCountdown() {
+    private void startCountdown() { // when starting the countdown I made sure to update all labels needed
         if (!timer.isRunning()) {
             if (timeLeft == 0) {
                 String selectedTime = (String) timeSelector.getSelectedItem();
@@ -40,17 +41,17 @@ class TimerPanel {
         }
     }
 
-    private void stopCountdown() {
+    private void stopCountdown() { // self-explanatory
         timer.stop();
     }
 
-    private void resetCountdown() {
+    private void resetCountdown() { //self-explanatory
         timer.stop();
         timeLeft = 0;
         countdownLabel.setText((String) timeSelector.getSelectedItem());
     }
 
-    private void updateCountdown() {
+    private void updateCountdown() {// self-explanatory
         if (timeLeft > 0) {
             timeLeft--;
             countdownLabel.setText(formatTime(timeLeft));
@@ -59,15 +60,15 @@ class TimerPanel {
             countdownLabel.setText((String) timeSelector.getSelectedItem());
         }
     }
-    // method for taking the string within the label and turning it into seconds
+    // method for taking the string within the label and turning it into seconds after selecting the required time
     private int parseTime(String time) {
         String[] parts = time.split(":");
-        int minutes = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[0]); // a pretty clever way of extracting information from a string, stole that..
         int seconds = Integer.parseInt(parts[1]);
         return minutes * 60 + seconds;
     }
 
-    private String formatTime(int totalSeconds) {
+    private String formatTime(int totalSeconds) { // returning the data in a clean format
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
@@ -113,7 +114,7 @@ class StopwatchPanel {
             stopwatchLabel.setText(formatTime(time_stopwatch));
         }
     }
-    private void flag_countdown(){
+    private void flag_countdown(){ // only different component to the previous code, self-explanatory nonetheless
         flagLabel.setText(stopwatchLabel.getText());
     }
     public String formatTime(int totalSeconds) {
@@ -151,7 +152,7 @@ class FitnessTracker {
         this.main_label = main_label;
         this.calories_goal = calories_goal;
         parseCalorieGoal();
-        addRep.addActionListener(e -> {
+        addRep.addActionListener(e -> { // had to get rid of the compact form whenever there were multiple lines of code, no visibility, thats all
             incrementReps(cals_pe);
             sets_label.setText("Sets: " + getSets());
             reps_label.setText("Reps: " + getReps());
@@ -174,7 +175,7 @@ class FitnessTracker {
         });
 
     }
-    private void parseCalorieGoal() {
+    private void parseCalorieGoal() { // this part took a lot of trial and error, fixed it with the help of Intellij
         try {
             goal = Double.parseDouble(calories_goal.getText());
         } catch (NumberFormatException e) {
@@ -182,7 +183,7 @@ class FitnessTracker {
         }
     }
 
-    public void chooseExercise(){
+    public void chooseExercise(){ //standard switch case for selecting items
         switch (selectedExercise){
             case "Squats":
                 cals_pe = 2.5;
@@ -203,7 +204,7 @@ class FitnessTracker {
                 cals_pe = 2;
         }
     }
-    public String choose_encouragement(){
+    public String choose_encouragement(){// encourangement system, Intellij helped me condense it firthen
         int courage = (int) Math.floor(Math.random()*5);
         if(goal<caloriesBurned){
             return encouragement = "You did it Buddy, you can rest today!";
@@ -218,7 +219,7 @@ class FitnessTracker {
         };
 
     }
-    public void incrementReps(double calories) {
+    public void incrementReps(double calories) { // self-explanatory
         reps++;
         caloriesBurned += calories;
         if (reps >= repsLimit) {
@@ -228,11 +229,11 @@ class FitnessTracker {
         }
     }
 
-    public void setRepsLimit(int repsLimit) {
+    public void setRepsLimit(int repsLimit) { //self-explanatory
         this.repsLimit = repsLimit;
     }
 
-    public int getReps() {
+    public int getReps() { //getters, yipee
         return reps;
     }
 
@@ -244,7 +245,7 @@ class FitnessTracker {
         return caloriesBurned;
     }
 
-    public void resetTracker() {
+    public void resetTracker() { //self-explanatory
         this.reps = 0;
         this.sets = 0;
         this.caloriesBurned = 0;
@@ -334,7 +335,7 @@ class CalorieTracker {
             default -> "TERMINATOR";
         };
     }
-    private void extract_protein(){
+    private void extract_protein(){ // I love Stack overflow, this way of condensing my code is soooo elegant, 10/10 took me 15 min
         String selectedItem = (String) protein_dropdown.getSelectedItem();
         switch (selectedItem){
             case String s when s.contains("Chicken") -> {addMacros(31, 0, 4, 165);}
@@ -413,7 +414,7 @@ class CalorieTracker {
         this.fats = 0;
         updateLabels();
     }
-    private void updateLabels(){
+    private void updateLabels(){ //updater
         protein_label.setText("Protein: " + getProtein() + "g");
         fats_label.setText("Fats: " + getFats()+ "g") ;
         carbs_label.setText("Carbs: " + getCarbs() + "g");
@@ -424,7 +425,7 @@ class CalorieTracker {
 class Bankai extends JPanel implements ActionListener {
     private static final int PANEL_WIDTH = 2000;
     private static final int PANEL_HEIGHT = 1200;
-    private static final int TIMER_DELAY = 16; // ~60 FPS IMPORTANT
+    private static final int TIMER_DELAY = 16; // ~60 FPS IMPORTANT, determines the speed of the petals
 
     private final int numPetals;
     private final ArrayList<Petals> petals = new ArrayList<>();
@@ -445,7 +446,7 @@ class Bankai extends JPanel implements ActionListener {
         timer.start();
     }
 
-    private void initPetals() {
+    private void initPetals() { //standard initialization function
         Random random = new Random();
         for (int i = 0; i < numPetals; i++) {
             double angle = random.nextDouble() * 2 * Math.PI;
@@ -454,7 +455,8 @@ class Bankai extends JPanel implements ActionListener {
         }
     }
 
-    public void paintComponent(Graphics g) { // I used this tutorial gor the 2d graphics https://www.youtube.com/watch?v=KcEvHq8Pqs0
+    public void paintComponent(Graphics g) {
+        // I used this tutorial gor the 2d graphics https://www.youtube.com/watch?v=KcEvHq8Pqs0, so most of the code is partially stolen
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         int imgWidth = byakuyaImage.getWidth(null) / 2;
@@ -473,7 +475,7 @@ class Bankai extends JPanel implements ActionListener {
         repaint();
     }
 
-    class Petals {
+    class Petals { // a pretty simple, but usefull class, I actually like nested class now, as well as composition
         private double centerX, centerY;
         private double angle, radius;
         private double speed;
@@ -492,7 +494,7 @@ class Bankai extends JPanel implements ActionListener {
             angle += speed;
         }
 
-        public void draw(Graphics2D petals) {
+        public void draw(Graphics2D petals) { // stolen code, sorry, Graphics 2D is something I am yet to master
             double x = centerX + Math.cos(angle) * radius;
             double y = centerY + Math.sin(angle) * radius;
             petals.setColor(color);
@@ -506,6 +508,8 @@ class CookieClicker{
     private JLabel cookies;
     private JTextField name;
     private Timer timer;
+    private Timer mainLabelTimer;
+    private Timer talkingLabelTimer;
     private double num_cookies;
     private double rate_cookies;
     String upgrade_selected;
@@ -515,79 +519,184 @@ class CookieClicker{
     private int mines;
     private int factories;
     private int banks;
-    public CookieClicker(JButton cookie, JComboBox upgrades, JLabel cookies, JTextField name) {
+    private JLabel dialogue;
+    public CookieClicker(JButton cookie, JComboBox upgrades, JLabel cookies, JTextField name, JLabel dialogue) {
         this.cookie = cookie;
         this.upgrades = upgrades;
         this.cookies = cookies;
         this.name = name;
+        this.dialogue = dialogue;
         this.timer = new Timer(1000, e -> update());
+        this.mainLabelTimer = new Timer(100, e -> cookies.setText("Cookies: " + num_cookies));
+        this.talkingLabelTimer = new Timer(5000, e -> dialogue.setText(choose_dialogue()));
+        this.talkingLabelTimer.start();
+        this.mainLabelTimer.start();
         this.timer.start();
-
         upgrades.addActionListener(e -> BuyUpgrade());
         cookie.addActionListener(e -> {
-            num_cookies += 5+ rate_cookies;
+            num_cookies += 5 + rate_cookies;
             cookies.setText("Cookies: " + num_cookies);
+            animateWobble(cookie);
         });
+    }
+    private String choose_dialogue() {
+        int courage = (int) Math.floor(Math.random() * 50) + 1;
+        if (name.getText().contains("Account")) {
+            return "Please insert your name";
+        }else {
+            return switch (courage) {
+                case 1 -> "Cookies for the win!" + name.getText();
+                case 2 -> "Bake it till perfect champ!";
+                case 3 -> "Sugar rush incoming!";
+                case 4 -> "Golden cookie spotted!";
+                case 5 -> "Milk levels rising fast!";
+                case 6 -> "Overflowing dough factory!";
+                case 7 -> "More sprinkles, more power!";
+                case 8 -> "Grandma’s baking overtime!";
+                case 9 -> "Ms. Yavuz, are you actually reading this code?";
+                case 10 -> "Choco chips unlocked!";
+                case 11 -> "Butter makes it better!" + name.getText();
+                case 12 -> "Ovens on overdrive!";
+                case 13 -> "Rolling in dough!" + name.getText();
+                case 14 -> "Cookies conquer all!";
+                case 15 -> "Sweetness overload achieved!";
+                case 16 -> "Sugary success unlocked!";
+                case 17 -> "Dough rising nicely!";
+                case 18 -> "Whisk it to win!" + name.getText();
+                case 19 -> "Bake more, worry less!";
+                case 20 -> "Cookie rain incoming!";
+                case 21 -> "Grandmas are unstoppable!";
+                case 22 -> "Golden cookie rain!";
+                case 23 -> "Flour towers built!" + name.getText();
+                case 24 -> "Butter never tasted better!";
+                case 25 -> "Infinite cookies await!";
+                case 26 -> "Click to conquer!";
+                case 27 -> "The dough knows best!";
+                case 28 -> "Rise of the cookies!";
+                case 29 -> "Crispy creations incoming!";
+                case 30 -> "Sprinkle your success!";
+                case 31 -> "Power of the oven!" + name.getText();
+                case 32 -> "Choco bliss achieved!";
+                case 33 -> "Endless cookies unlocked!";
+                case 34 -> "Bake it to greatness!";
+                case 35 -> "Oven upgrades complete!";
+                case 36 -> "Dough machine activated!";
+                case 37 -> "Batter up, champ!";
+                case 38 -> "Flour power unlocked!";
+                case 39 -> "Oven domination achieved!";
+                case 40 -> "Cookie empire growing!";
+                case 41 -> "The sweet smell of victory!";
+                case 42 -> "Grandmas are legendary!";
+                case 43 -> "Click and conquer!";
+                case 44 -> "Cookies cure everything!";
+                case 45 -> "Rolling pin of destiny!";
+                case 46 -> "Sprinkles and sparkles!";
+                case 47 -> "Oven gods awakened!" + name.getText();
+                case 48 -> "Bake like no tomorrow!";
+                case 49 -> "Rise, dough, rise!";
+                case 50 -> "Golden cookies everywhere!";
+                default -> "";
+            };
+        }
+    }
+    void animateWobble(JButton button) { // this took me longer than I would like to admit, also the button started traveling 
+        // around the screen if you pressed it too many times, but now it is fixed.. phew...
+        // I just change the size a couple of times in a couple of miliseconds, so it isn't a static image
+        int originalX = button.getX();
+        int originalY = button.getY();
+        int originalWidth = button.getWidth();
+        int originalHeight = button.getHeight();
 
+        Timer wobbleTimer = new Timer(10, new ActionListener() {
+            int counter = 0;
+            final int maxWobbleFrames = 3;
+            final int wobbleRange = 15;
+            public void actionPerformed(ActionEvent e) {
+                if (counter >= maxWobbleFrames) {
+                    ((Timer) e.getSource()).stop();
+                    button.setBounds(originalX, originalY, originalWidth, originalHeight);
+                } else {
+                    int wobbleWidth = originalWidth + (int) (Math.sin(counter * 2) * wobbleRange);
+                    int wobbleHeight = originalHeight + (int) (Math.cos(counter * 2) * wobbleRange);
+                    button.setBounds(originalX,originalY, wobbleWidth, wobbleHeight);
+                    counter++;
+                }
+            }
+        });
+        wobbleTimer.start();
     }
     void update(){
         num_cookies+=rate_cookies;
         cookies.setText("Cookies: " + num_cookies);
     }
-    void BuyUpgrade(){
+    void BuyUpgrade(){ // it was hard to compact it here
         upgrade_selected = (String) upgrades.getSelectedItem();
 
-            switch (upgrade_selected){
-                case String s when s.contains("Cursor") -> {if(num_cookies >= (50 + (cursors * 25))){
-                    num_cookies -= (50 + (cursors * 25));
-                    cursors++;
-                    rate_cookies +=((double) 1/2);
-                }}
-                case String s when s.contains("Grandma") -> {if(num_cookies >= (500 + (grandmas * 125))){
-                    num_cookies -= (500 + (grandmas * 125));
-                    grandmas++;
-                    rate_cookies +=5;
-                }}
-                case String s when s.contains("Farm") -> {if(num_cookies >= (5000 + (farms * 750))){
-                    num_cookies -= (5000 + (farms * 750));
-                    farms++;
-                    rate_cookies +=50;
-                }}
-                case String s when s.contains("Mine") -> {if(num_cookies >= (50000 + (mines * 2500))){
-                    num_cookies -= (50000 + (mines * 2500));
-                    mines++;
-                    rate_cookies +=500;
-                }}
-                case String s when s.contains("Factory") -> {if(num_cookies >= (500000 + (factories * 17500))){
-                    num_cookies -= (500000 + (factories * 17500));
-                    factories++;
-                    rate_cookies +=5000;
-                }}
-                case String s when s.contains("Bank") -> {if(num_cookies >= (5000000 + (banks * 75000))){
-                    num_cookies -= (5000000 + (banks * 75000));
-                    banks++;
-                    rate_cookies += 50000;
-                }}
-                default -> {}
+        switch (upgrade_selected){
+            case String s when s.contains("Cursor") -> {if(num_cookies >= (50 + (cursors * 25))){
+                num_cookies -= (50 + (cursors * 25));
+                cursors++;
+                rate_cookies +=((double) 1/2);
+            }}
+            case String s when s.contains("Grandma") -> {if(num_cookies >= (500 + (grandmas * 125))){
+                num_cookies -= (500 + (grandmas * 125));
+                grandmas++;
+                rate_cookies +=5;
+            }}
+            case String s when s.contains("Farm") -> {if(num_cookies >= (5000 + (farms * 750))){
+                num_cookies -= (5000 + (farms * 750));
+                farms++;
+                rate_cookies +=50;
+            }}
+            case String s when s.contains("Mine") -> {if(num_cookies >= (50000 + (mines * 2500))){
+                num_cookies -= (50000 + (mines * 2500));
+                mines++;
+                rate_cookies +=500;
+            }}
+            case String s when s.contains("Factory") -> {if(num_cookies >= (500000 + (factories * 17500))){
+                num_cookies -= (500000 + (factories * 17500));
+                factories++;
+                rate_cookies +=5000;
+            }}
+            case String s when s.contains("Bank") -> {if(num_cookies >= (5000000 + (banks * 75000))){
+                num_cookies -= (5000000 + (banks * 75000));
+                banks++;
+                rate_cookies += 50000;
+            }}
+            default -> {}
+
         }
+        updateUpgradeOptions();
     }
-    int returnCursor_price(){
+    int returnCursor_price(){ // getters, don't know why I called them returners ...
         return (50 + (cursors * 25));
     }
     int returnGrandma_price(){
         return (500 + (grandmas * 125));
     }
     int returnFarm_price(){
-        return (50 + (cursors * 25));
+        return (5000 + (farms * 750));
     }
     int returnMine_price(){
-        return (500 + (grandmas * 125));
+        return (50000 + (mines * 2500));
     }
     int returnFactory_price(){
-        return (50 + (cursors * 25));
+        return (500000 + (factories * 17500));
     }
     int returnBank_price(){
-        return (500 + (grandmas * 125));
+        return (5000000 + (banks * 75000));
+    }
+    public void updateUpgradeOptions() { // this was complicated, I didn't enjoy it,Stack overflowed it, didn't work 
+        // GPT'd it, didn't work and had to figure out with my own small brain and Stack overflow depths..
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Upgrades");
+        model.addElement("Cursor - Price: " + returnCursor_price() + " | Cursors: " + cursors);
+        model.addElement("Grandma - Price: " + returnGrandma_price() + " | Grandmas: " + grandmas);
+        model.addElement("Farm - Price: " + returnFarm_price() + " | Farms: " + farms);
+        model.addElement("Mine - Price: " + returnMine_price() + " | Mines: " + mines);
+        model.addElement("Factory - Price: " + returnFactory_price() + " | Factories: " + factories);
+        model.addElement("Bank - Price: " + returnBank_price() + " | Banks: " + banks);
+        upgrades.setModel(model);
     }
 }
 public class Main {
@@ -596,7 +705,7 @@ public class Main {
     private JPanel mainPanel;
 
     public static void main(String[] args) throws MalformedURLException {
-        new Main().createGUI();
+        new Main().createGUI(); // had to imitialize it like this, Intellij told me it was a solution
     }
     // the GUI is the main component of the Main class, since the cardLayout and JPanels have to bo defined for the entire class, not individual methods
     public void createGUI() throws MalformedURLException {
@@ -607,7 +716,7 @@ public class Main {
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
-
+        // creating the panels within the cardLayout, yeah, thats about it
         JPanel mainMenuPanel = createMainMenuPanel();
         JPanel countdownPanel = createCountdownPanel();
         JPanel panel2 = createStopwatchPanel();
@@ -634,13 +743,13 @@ public class Main {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 5, 20, 20));
         panel.setBackground(new Color(30, 30, 30));
-
-        URL[] iconURLs = null;
+        // making the amount of panels equal the number of URL's, also Intellij helped me so much with structure, mvp
+        URL[] iconURLs = null; 
         try {
             iconURLs = new URL[]{
-                    new URL("https://cdn-icons-png.flaticon.com/512/4893/4893024.png"), // Online URL
-                    new URL("https://cdn-icons-png.flaticon.com/512/3003/3003202.png"), // Local file paths use "file:///" prefix
-                    new URL("https://cdn-icons-png.flaticon.com/512/6750/6750831.png"), // Replace spaces with "%20"
+                    new URL("https://cdn-icons-png.flaticon.com/512/4893/4893024.png"), 
+                    new URL("https://cdn-icons-png.flaticon.com/512/3003/3003202.png"), 
+                    new URL("https://cdn-icons-png.flaticon.com/512/6750/6750831.png"),
                     new URL("https://cdn-icons-png.flaticon.com/512/2058/2058065.png"),
                     new URL("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/062e5e10-0d29-4a44-941a-de4fad7ab823/d7j5cbh-92f99e6f-234b-493e-ab79-30af027a0fcc.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzA2MmU1ZTEwLTBkMjktNGE0NC05NDFhLWRlNGZhZDdhYjgyM1wvZDdqNWNiaC05MmY5OWU2Zi0yMzRiLTQ5M2UtYWI3OS0zMGFmMDI3YTBmY2MucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.PtspoHaaQuRZfHvCk_2FIK8AbrPYRS5QKyxkSpHj6d4"),
                     new URL("https://cdn-icons-png.flaticon.com/512/614/614180.png")
@@ -648,7 +757,7 @@ public class Main {
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
-
+        // passing the icons and creating some button colors and functionality
         for (int i = 0; i < iconURLs.length; i++) {
             ImageIcon icon = new ImageIcon(iconURLs[i]);
             JButton button = new JButton(icon);
@@ -679,6 +788,10 @@ public class Main {
     }
 
     public JPanel createCountdownPanel() {
+        // 1, initializing elements
+        // 2 adding them to the panel
+        // 3 creating the functionall class and adding everything to the panel
+        // It is the same for the others
         JPanel panel1 = createPanel("Countdown", 1);
         JLabel countdown = Create_label("00:00", 200, 530, 125, 900, 400);
         JButton start = Create_button("Start", 50, 530, 550, 400, 80, 12, 200, 12);
@@ -696,7 +809,6 @@ public class Main {
         panel1.add(reset);
         panel1.add(comboBox);
 
-        // Initialize TimerPanel logic
         new TimerPanel(countdown, start, stop, reset, comboBox);
 
         return panel1;
@@ -730,6 +842,7 @@ public class Main {
         JButton repButton = Create_button("Add Rep", 50, 50, 675, 400, 100, 50, 200, 50);
         JButton resetTracker = Create_button("Reset", 50, 50, 800, 400, 100, 50, 200, 50);
         JComboBox<String> regimeSelector = Create_combobox(new String[]{"Reps in a set","6", "8", "10", "12", "14"}, 50, 650, 300, 500, 100);
+        // creating the custon icons, excited that GIF's work
         URL ronnieURL = new URL("https://media3.giphy.com/media/nIDFKbfyUx68r7bTEb/giphy.gif?cid=6c09b952jngtv4p9xmotgj69lcojhre3ccz7gwnb7aades4h&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=s");
         JTextField calorie_goal = new JTextField("Calorie Goal");
         calorie_goal.setBounds(650,550,500,100);
@@ -864,9 +977,9 @@ public class Main {
         taskLabel.setHorizontalAlignment(SwingConstants.CENTER);
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-
+        // here I added the class to the panel, since it is an animation
         panel.add(bankai, BorderLayout.CENTER);
-        panel.add(taskLabel, BorderLayout.NORTH);
+        panel.add(taskLabel, BorderLayout.NORTH); // created the main menu buttons to be passed over the animation
         panel.add(returnButton, BorderLayout.SOUTH);
         bankai.setOpaque(false);
         panel.setBackground(Color.BLACK);
@@ -876,22 +989,24 @@ public class Main {
     public JPanel createCookieClicker() throws MalformedURLException {
 
         JLabel cookies = Create_label("Cookies: ", 50, 250, 100, 1200, 100);
+        JLabel main = Create_label("Please tell us your name", 50, 250, 220, 1200, 100);
+        main.setBackground(Color.ORANGE);
         cookies.setBackground(Color.ORANGE);
-        JButton cookie = Create_button("", 1, 100, 300, 500, 500, 0, 0, 0);
+        JButton cookie = Create_button("", 1, 100, 360, 500, 500, 0, 0, 0);
         JTextField name = new JTextField("Account name");
-        name.setBounds(200, 830, 500, 100);
+        name.setBounds(100, 870, 500, 100);
         name.setFont(new Font("Arial", Font.HANGING_BASELINE, 50));
         name.setOpaque(true);
         name.setBackground(Color.ORANGE);
         name.setForeground(Color.WHITE);
-        String[] upgrades = {
-                "Upgrades","Cursor","Grandma","Farm","Mine","Factory","Bank"
-        };
 
-        JComboBox<String> upgrades_box = Create_combobox(upgrades,50, 800, 300,500,100);
-        CookieClicker clicker = new CookieClicker(cookie, upgrades_box, cookies, name);
-        String[] upgrades2 = {"Upgrades", "Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank"};
-        upgrades_box.setModel(upgrades2[]);
+        String[] upgrades = {"Upgrades", "Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank"};
+        JComboBox<String> upgrades_box = Create_combobox(upgrades, 50, 800, 400, 1000, 100);
+
+        CookieClicker clicker = new CookieClicker(cookie, upgrades_box, cookies, name, main);
+
+        clicker.updateUpgradeOptions();
+
         URL cookie_url = new URL("https://cdn-icons-png.flaticon.com/512/614/614180.png");
         ImageIcon cookie_icon = new ImageIcon(cookie_url);
         cookie.setIcon(cookie_icon);
@@ -899,15 +1014,18 @@ public class Main {
         cookie.setBorderPainted(false);
         cookie.setContentAreaFilled(false);
         upgrades_box.setBackground(Color.ORANGE);
+
         JPanel panel = createPanel("Cookie Clicker", 6);
         panel.add(cookies);
         panel.add(cookie);
         panel.add(upgrades_box);
         panel.add(name);
+        panel.add(main);
         return panel;
     }
 
     public JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length, int red, int green, int blue) {
+        // creating GUI elements, so it will be more condensed, didn't add for every element, but at some point I got tired and gave up, thanks for reading
         JButton button = new JButton(name);
         button.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
         button.setOpaque(true);
