@@ -1,0 +1,96 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.CropImageFilter;
+
+public class Main {
+    public static void main(String[] args) {
+    JFrame main = new JFrame();
+        main.setLayout(null);
+        main.setSize(2400,1200);
+        main.setLocationRelativeTo(null);
+        main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    JPanel operators = new JPanel();
+        operators.setBounds(300,300,1300,300);
+        operators.setOpaque(true);
+        operators.setBackground(Color.BLUE);
+        main.add(operators);
+        main.setVisible(true);
+        JLabel title = Create_label("Movie Collection Manager", 100, 300,50,1300,200, main);
+    }
+
+    public static JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length, int red, int green, int blue, JFrame frame) {
+        // creating GUI elements, so it will be more condensed, didn't add for every element, but at some point I got tired and gave up, thanks for reading
+        JButton button = new JButton(name);
+        button.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
+        button.setOpaque(true);
+        button.setBackground(new Color(red, green, blue));
+        button.setBounds(xstart, ystart, width, length);
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setFocusPainted(false);
+        button.setForeground(Color.WHITE);
+        frame.add(button);
+        return button;
+    }
+
+    public static JLabel Create_label(String name, int font_size, int xstart, int ystart, int width, int length, JFrame frame) {
+        JLabel label = new JLabel(name);
+        label.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
+        label.setOpaque(true);
+        label.setBackground(new Color(63, 81, 181));
+        label.setBounds(xstart, ystart, width, length);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        frame.add(label);
+        return label;
+    }
+
+    public static JComboBox<String> Create_combobox(String[] items, int font_size, int xstart, int ystart, int width, int length, JFrame frame) {
+        JComboBox<String> comboBox = new JComboBox<>(items);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, font_size));
+        comboBox.setBounds(xstart, ystart, width, length);
+        comboBox.setOpaque(true);
+        comboBox.setBackground(new Color(12, 200, 200));
+        comboBox.setForeground(Color.WHITE);
+        comboBox.setFocusable(false);
+        frame.add(comboBox);
+        return comboBox;
+    }
+}
+class Movie{
+    private String name;
+    private String genre;
+    private int length;
+    private int rating;
+    public Movie(String name, String genre,int length,int rating){
+        this.name = name;
+        this.genre = genre;
+        this.length = length;
+        this.rating = rating;
+    }
+    public String getGenre(){
+        return genre;
+    }
+    public String getName(){
+        return name;
+    }
+    public int getLength(){
+        return length;
+    }
+    public int getRating(){
+        return rating;
+    }
+    public void setName(String new_name){
+        name = new_name;
+    }
+    public void setGenre(String new_genre){
+        genre = new_genre;
+    }
+    public void setRating(int new_rating){
+        rating = new_rating;
+    }
+    public void setLength(int new_length){
+        length = new_length;
+    }
+
+}
