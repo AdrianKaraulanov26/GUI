@@ -1,62 +1,84 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.image.CropImageFilter;
 
 public class Main {
     public static void main(String[] args) {
-    JFrame main = new JFrame();
+        JFrame main = new JFrame("Movie Collection Manager");
         main.setLayout(null);
-        main.setSize(2400,1200);
+        main.setSize(1200, 800);
         main.setLocationRelativeTo(null);
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    JPanel operators = new JPanel();
-        operators.setBounds(300,300,1300,300);
-        operators.setOpaque(true);
-        operators.setBackground(Color.BLUE);
-        main.add(operators);
+        JLabel title = Create_label("Movie Collection Manager", 24, 50, 20, 400, 50, main);
+        JLabel genre_label = Create_label("Genre:", 16, 50, 100, 100, 30, main);
+        JLabel name_label = Create_label("Title:", 16, 50, 150, 100, 30, main);
+        JLabel length_label = Create_label("Length:", 16, 50, 200, 100, 30, main);
+        JLabel rating_label = Create_label("Rating:", 16, 50, 250, 100, 30, main);
+
+        JTextField name_field = Create_textfield("*title*", 16, 160, 150, 200, 30, main);
+        String[] genres_categories = {"Rom-Com", "Action", "Drama", "Game show", "Anime", "Fantasy", "Horror"};
+        JComboBox<String> genres = Create_combobox(genres_categories, 16, 160, 100, 200, 30, main);
+        String[] lengths = {"Under 30 min", "30-60 min", "60-90 min", "90-110 min", "120+ min", "Too long"};
+        JComboBox<String> length = Create_combobox(lengths, 16, 160, 200, 200, 30, main);
+        JSlider rating_slider = Create_slider(1, 10, 5, 160, 250, 200, 50, 1, Color.LIGHT_GRAY, main);
+
+        // Table data
+        String[] columns = {"Title", "Genre", "Length", "Rating"};
+        String[][] data = {
+            {"Inception", "Action", "120+ min", "5"},
+            {"Your Name", "Anime", "90-110 min", "5"},
+            {"Titanic", "Drama", "120+ min", "4"},
+        };
+        JTable movieTable = Create_table(data, columns, 400, 100, 600, 300, Color.WHITE, main);
+
         main.setVisible(true);
-        JLabel title = Create_label("Movie Collection Manager", 100, 300,50,1300,200, main);
     }
 
-    public static JButton Create_button(String name, int font_size, int xstart, int ystart, int width, int length, int red, int green, int blue, JFrame frame) {
-        // creating GUI elements, so it will be more condensed, didn't add for every element, but at some point I got tired and gave up, thanks for reading
-        JButton button = new JButton(name);
-        button.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
-        button.setOpaque(true);
-        button.setBackground(new Color(red, green, blue));
-        button.setBounds(xstart, ystart, width, length);
-        button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.setFocusPainted(false);
-        button.setForeground(Color.WHITE);
-        frame.add(button);
-        return button;
-    }
-
-    public static JLabel Create_label(String name, int font_size, int xstart, int ystart, int width, int length, JFrame frame) {
+    public static JLabel Create_label(String name, int font_size, int x, int y, int width, int height, JFrame frame) {
         JLabel label = new JLabel(name);
-        label.setFont(new Font("Arial", Font.HANGING_BASELINE, font_size));
-        label.setOpaque(true);
-        label.setBackground(new Color(63, 81, 181));
-        label.setBounds(xstart, ystart, width, length);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.BOLD, font_size));
+        label.setBounds(x, y, width, height);
         frame.add(label);
         return label;
     }
 
-    public static JComboBox<String> Create_combobox(String[] items, int font_size, int xstart, int ystart, int width, int length, JFrame frame) {
+    public static JTextField Create_textfield(String name, int font_size, int x, int y, int width, int height, JFrame frame) {
+        JTextField textfield = new JTextField(name);
+        textfield.setFont(new Font("Arial", Font.PLAIN, font_size));
+        textfield.setBounds(x, y, width, height);
+        frame.add(textfield);
+        return textfield;
+    }
+
+    public static JComboBox<String> Create_combobox(String[] items, int font_size, int x, int y, int width, int height, JFrame frame) {
         JComboBox<String> comboBox = new JComboBox<>(items);
         comboBox.setFont(new Font("Arial", Font.PLAIN, font_size));
-        comboBox.setBounds(xstart, ystart, width, length);
-        comboBox.setOpaque(true);
-        comboBox.setBackground(new Color(12, 200, 200));
-        comboBox.setForeground(Color.WHITE);
-        comboBox.setFocusable(false);
+        comboBox.setBounds(x, y, width, height);
         frame.add(comboBox);
         return comboBox;
     }
+
+    public static JSlider Create_slider(int min, int max, int value, int x, int y, int width, int height, int tickSpacing, Color background, JFrame frame) {
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, value);
+        slider.setBounds(x, y, width, height);
+        slider.setBackground(background);
+        slider.setMajorTickSpacing(tickSpacing);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        frame.add(slider);
+        return slider;
+    }
+
+    public static JTable Create_table(String[][] data, String[] columns, int x, int y, int width, int height, Color background, JFrame frame) {
+        JTable table = new JTable(data, columns);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(x, y, width, height);
+        frame.add(scrollPane);
+        return table;
+    }
 }
+
 class Movie{
     private String name;
     private String genre;
