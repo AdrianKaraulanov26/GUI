@@ -1,0 +1,232 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import java.util.ArrayList;
+import java.util.Comparator;
+
+public class Main {
+    private static JTable movieTable;
+    private static DefaultTableModel tableModel;
+    private static ArrayList<Movie> movieList = new ArrayList<>();
+
+    public static void main(String[] args) {
+        JFrame main = new JFrame("Movie Collection Manager");
+        main.setLayout(null);
+        main.setSize(1200, 800);
+        main.setLocationRelativeTo(null);
+        main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JLabel title = Create_label("Movie Collection Manager", 24, 50, 20, 400, 50, main);
+        JLabel genre_label = Create_label("Genre:", 16, 50, 100, 100, 30, main);
+        JLabel name_label = Create_label("Title:", 16, 50, 150, 100, 30, main);
+        JLabel length_label = Create_label("Length:", 16, 50, 200, 100, 30, main);
+        JLabel rating_label = Create_label("Rating:", 16, 50, 250, 100, 30, main);
+
+        JTextField name_field = Create_textfield("*title*", 16, 160, 150, 200, 30, main);
+        String[] genres_categories = {"Genre","Rom-Com", "Action", "Drama", "Game show", "Anime", "Fantasy", "Horror"};
+        JComboBox<String> genres = Create_combobox(genres_categories, 16, 160, 100, 200, 30, main);
+        String[] lengths = {"Length","Under 30 min", "30-60 min", "60-90 min", "90-110 min", "120+ min", "Too long"};
+        JComboBox<String> length = Create_combobox(lengths, 16, 160, 200, 200, 30, main);
+        JSlider rating_slider = Create_slider(1, 10, 5, 160, 250, 200, 50, 1, Color.LIGHT_GRAY, main);
+
+        JButton addButton = Create_button("Add Movie", 16, 160, 320, 200, 40, main);
+        JButton sortButton = Create_button("Sort by Rating", 16, 160, 380, 200, 40, main);
+        JButton searchButton = Create_button("Search Movie", 16, 160, 440, 200, 40, main);
+        JTextField searchField = Create_textfield("*title*", 16, 160, 500, 200, 30, main);
+        JLabel search_title = Create_label("Title:", 16, 50, 500, 100, 30, main);
+        JLabel count = Create_label("Total movie count:", 16, 50, 550, 200, 30, main);
+        String[] columns = {"Title", "Genre", "Length", "Rating"};
+        tableModel = new DefaultTableModel(columns, 0);
+        movieTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(movieTable);
+        scrollPane.setBounds(400, 100, 600, 600);
+        main.add(scrollPane);
+        movieTable.setRowHeight(50);
+        movieTable.setShowGrid(true);
+        movieTable.setGridColor(new Color(230, 230, 230));
+        movieTable.setIntercellSpacing(new Dimension(5, 5));
+        movieTable.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        JTableHeader header = movieTable.getTableHeader();
+        header.setFont(new Font("Arial", Font.BOLD, 14));
+        header.setBackground(new Color(100, 130, 180));
+        header.setForeground(Color.WHITE); // White text
+        header.setPreferredSize(new Dimension(header.getWidth(), 35));
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String title = name_field.getText().trim();
+                String genre = (String) genres.getSelectedItem();
+                String lengthStr = (String) length.getSelectedItem();
+                int rating = rating_slider.getValue();
+
+                if (title.isEmpty() || genres.getSelectedItem() =="Genre" || length.getSelectedItem() == "Length") {
+                    JOptionPane.showMessageDialog(main, "Please enter valid movie stats", "Pleas be serious", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                int lengthMinutes = convertLengthToMinutes(lengthStr);
+                Movie newMovie = new Movie(title, genre, lengthMinutes, rating);
+                movieList.add(newMovie);
+                updateTable();
+                count.setText("Total movie count: " + movieList.size());
+                name_field.setText("");
+                genres.setSelectedIndex(0);
+                length.setSelectedIndex(0);
+                rating_slider.setValue(5);
+            }
+        });
+
+        sortButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                movieList.sort(Comparator.comparingInt(Movie::getRating).reversed());//I didn't create this, credit to Stack Overflow
+                updateTable();
+                count.setText("Total movie count: " + movieList.size());
+            }
+        });
+        searchButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String searchTitle = searchField.getText().trim().toLowerCase();
+                if (searchTitle.isEmpty()) {
+                    JOptionPane.showMessageDialog(main, "Please enter a movie title to search", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                boolean found = false;
+                for (int i = 0; i < movieList.size(); i++) {
+                    if (movieList.get(i).getName().toLowerCase().contains(searchTitle)) {
+                        // Move found movie to top of list
+                        Movie foundMovie = movieList.remove(i);
+                        movieList.add(0, foundMovie);
+                        updateTable();
+                        movieTable.setRowSelectionInterval(0, 0);
+                        movieTable.setSelectionBackground(Color.YELLOW);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    JOptionPane.showMessageDialog(main, "Movie not found", "Info", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
+
+        main.setVisible(true);
+    }
+
+    private static void updateTable() {
+        tableModel.setRowCount(0);
+        for (Movie movie : movieList) {
+            String lengthStr = convertMinutesToLength(movie.getLength());
+            tableModel.addRow(new Object[]{
+                    movie.getName(),
+                    movie.getGenre(),
+                    lengthStr,
+                    String.valueOf(movie.getRating())
+            });
+        }
+        movieTable.clearSelection();
+
+    }
+
+    private static int convertLengthToMinutes(String lengthStr) { // I was lazy to change the int to string, so I just made an entire new method for fixing a non existant problem
+        switch (lengthStr) {
+            case "Under 30 min": return 30;
+            case "30-60 min": return 60;
+            case "60-90 min": return 90;
+            case "90-110 min": return 110;
+            case "120+ min": return 120;
+            case "Too long": return 180;
+            default: return 0;
+        }
+    }
+
+    private static String convertMinutesToLength(int minutes) {
+        if (minutes <= 30) return "Under 30 min";
+        if (minutes <= 60) return "30-60 min";
+        if (minutes <= 90) return "60-90 min";
+        if (minutes <= 110) return "90-110 min";
+        if (minutes <= 120) return "120+ min";
+        return "Too long";
+    }
+
+    public static JLabel Create_label(String name, int font_size, int x, int y, int width, int height, JFrame frame) {
+        JLabel label = new JLabel(name);
+        label.setFont(new Font("Arial", Font.BOLD, font_size));
+        label.setBounds(x, y, width, height);
+        frame.add(label);
+        return label;
+    }
+
+    public static JTextField Create_textfield(String name, int font_size, int x, int y, int width, int height, JFrame frame) {
+        JTextField textfield = new JTextField(name);
+        textfield.setFont(new Font("Arial", Font.PLAIN, font_size));
+        textfield.setBounds(x, y, width, height);
+        textfield.setBackground(Color.WHITE);
+        frame.add(textfield);
+        return textfield;
+    }
+
+    public static JComboBox<String> Create_combobox(String[] items, int font_size, int x, int y, int width, int height, JFrame frame) {
+        JComboBox<String> comboBox = new JComboBox<>(items);
+        comboBox.setFont(new Font("Arial", Font.PLAIN, font_size));
+        comboBox.setBounds(x, y, width, height);
+        comboBox.setBackground(Color.WHITE);
+        frame.add(comboBox);
+        return comboBox;
+    }
+
+    public static JSlider Create_slider(int min, int max, int value, int x, int y, int width, int height, int tickSpacing, Color background, JFrame frame) {
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, value);
+        slider.setBounds(x, y, width, height);
+        slider.setBackground(background);
+        slider.setMajorTickSpacing(tickSpacing);
+        slider.setBackground(Color.WHITE);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        frame.add(slider);
+        return slider;
+    }
+
+    public static JButton Create_button(String name, int font_size, int x, int y, int width, int height, JFrame frame) {
+        JButton button = new JButton(name);
+        button.setFont(new Font("Arial", Font.PLAIN, font_size));
+        button.setBounds(x, y, width, height);
+        button.setBackground(Color.WHITE);
+        frame.add(button);
+        return button;
+    }
+}
+
+class Movie {
+    private String name;
+    private String genre;
+    private int length;
+    private int rating;
+
+    public Movie(String name, String genre, int length, int rating) {
+        this.name = name;
+        this.genre = genre;
+        this.length = length;
+        this.rating = rating;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+}
