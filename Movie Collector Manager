@@ -96,7 +96,6 @@ public class Main {
                 boolean found = false;
                 for (int i = 0; i < movieList.size(); i++) {
                     if (movieList.get(i).getName().toLowerCase().contains(searchTitle)) {
-                        // Move found movie to top of list
                         Movie foundMovie = movieList.remove(i);
                         movieList.add(0, foundMovie);
                         updateTable();
