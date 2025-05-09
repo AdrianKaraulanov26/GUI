@@ -283,7 +283,7 @@ public class Main {
 
     public static void toggleAdminPanel() {
         String password = new String(passwordField.getPassword());
-        if ("admin123".equals(password)) {
+        if ("porcusini cocosini".equals(password)) {
             adminPanel.setVisible(!adminPanel.isVisible());
             passwordField.setText("");
             frame.revalidate();
