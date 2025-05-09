@@ -311,7 +311,7 @@ public class Main {
     public static void printReceipt() {
         int receiptNumber = (int) Math.floor(Math.random() * 99999);
         LocalDateTime thisDate = LocalDateTime.now();
-        String path = "receipt" + receiptNumber + ".";
+        String path = "receipt" + receiptNumber + ".txt";
 
         try (FileWriter fw = new FileWriter(path, true)) {
             fw.write("---------------------" + "\n");
@@ -345,7 +345,7 @@ public class Main {
     }
 
     public static void saveItemsToFile() {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("items."))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("items.txt"))) {
             for (Items item : items) {
                 writer.println(item.getCode() + "," + item.getName() + "," +
                         item.getPrice() + "," + item.getCategory() + "," +
@@ -568,5 +568,4 @@ class Items {
     public void setPrice(int price) { this.price = price; }
     public void setCategory(int category) { this.category = category; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
-    public void setCode(String code) { this.code = code; }
 }
