@@ -147,7 +147,7 @@ public class Main {
         try {
             String code = itemCodeField.getText();
             String name = itemNameField.getText();
-            int price = (int)(Double.parseDouble(itemPriceField.getText()) * 100);
+            int price = (int) (Double.parseDouble(itemPriceField.getText()) * 100);
             int category = Integer.parseInt(itemCategoryField.getText());
             int quantity = Integer.parseInt(itemQuantityField.getText());
 
@@ -209,25 +209,51 @@ public class Main {
     }
 
     public static void addToCart(int selectedRow) {
-        if (selectedRow >= 0 && selectedRow < items.size()) {
-            Items item = items.get(selectedRow);
-            for (int i = 0; i < cartTableModel.getRowCount(); i++) {
-                if (cartTableModel.getValueAt(i, 0).equals(item.getName())) {
-                    int qty = (int) cartTableModel.getValueAt(i, 2) + 1;
-                    int total = item.getPrice() * qty;
-                    cartTableModel.setValueAt(qty, i, 2);
-                    cartTableModel.setValueAt("$" + (total / 100.0), i, 3);
-                    updateTotal();
-                    return;
+        if (selectedRow >= 0 && selectedRow < itemsTableModel.getRowCount()) {
+            String itemCode = (String) itemsTableModel.getValueAt(selectedRow, 0);
+            Items item = null;
+
+            for (Items i : items) {
+                if (i.getCode().equals(itemCode)) {
+                    item = i;
+                    break;
                 }
             }
-            cartTableModel.addRow(new Object[]{
-                    item.getName(),
-                    "$" + (item.getPrice() / 100.0),
-                    1,
-                    "$" + (item.getPrice() / 100.0)
-            });
-            updateTotal();
+
+            if (item != null) {
+                if (item.getQuantity() <= 0) {
+                    JOptionPane.showMessageDialog(frame, "Item out of stock!", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                for (int i = 0; i < cartTableModel.getRowCount(); i++) {
+                    if (cartTableModel.getValueAt(i, 0).equals(item.getName())) {
+                        int qty = (int) cartTableModel.getValueAt(i, 2) + 1;
+                        int total = item.getPrice() * qty;
+
+                        cartTableModel.setValueAt(qty, i, 2);
+                        cartTableModel.setValueAt("$" + (total / 100.0), i, 3);
+
+                        item.setQuantity(item.getQuantity() - 1);
+                        saveItemsToFile();
+                        updateItemsTable(searchField.getText());
+                        updateTotal();
+                        return;
+                    }
+                }
+
+                cartTableModel.addRow(new Object[]{
+                        item.getName(),
+                        "$" + (item.getPrice() / 100.0),
+                        1,
+                        "$" + (item.getPrice() / 100.0)
+                });
+
+                item.setQuantity(item.getQuantity() - 1);
+                saveItemsToFile();
+                updateItemsTable(searchField.getText());
+                updateTotal();
+            }
         }
     }
 
@@ -235,7 +261,7 @@ public class Main {
         currentTotal = 0;
         for (int i = 0; i < cartTableModel.getRowCount(); i++) {
             String totalStr = cartTableModel.getValueAt(i, 3).toString().substring(1);
-            currentTotal += (int)(Double.parseDouble(totalStr) * 100);
+            currentTotal += (int) (Double.parseDouble(totalStr) * 100);
         }
         totalField.setText(String.format("$%.2f", currentTotal / 100.0));
     }
@@ -270,7 +296,7 @@ public class Main {
 
             double denomValue = Double.parseDouble(denomination.substring(1)) * 100;
             if (change >= denomValue) {
-                int count = (int)(change / denomValue);
+                int count = (int) (change / denomValue);
                 change = change % denomValue;
                 changeField.setText(String.format("$%.2f", change / 100.0));
                 JOptionPane.showMessageDialog(frame,
@@ -311,13 +337,13 @@ public class Main {
     public static void printReceipt() {
         int receiptNumber = (int) Math.floor(Math.random() * 99999);
         LocalDateTime thisDate = LocalDateTime.now();
-        String path = "receipt" + receiptNumber + ".txt";
+        String path = "/home/akaraulanov26/GitHub/" + receiptNumber + ".txt";
 
         try (FileWriter fw = new FileWriter(path, true)) {
             fw.write("---------------------" + "\n");
             fw.write("Cash receipt id:" + receiptNumber + "\n");
             fw.write("---------------------" + "\n\n");
-            fw.write("Adrian's Warehouse    " + "\n"+"    495 Birch Street, NY 10014, USA\n");
+            fw.write("Adrian's Warehouse    " + "\n" + "    495 Birch Street, NY 10014, USA\n");
             fw.write("Date:      " + thisDate + "\n\n");
             fw.write("---------------------" + "\n");
             fw.write("Items Purchased:" + "\n");
@@ -405,7 +431,7 @@ public class Main {
         addToCartButton.addActionListener(e -> addToCart(itemsTable.getSelectedRow()));
 
         JPanel searchPanel = createPanel("Search");
-        searchPanel.setLayout(new BorderLayout(10,10));
+        searchPanel.setLayout(new BorderLayout(10, 10));
         searchField = createStyledTextField("Search by ID", true);
         searchButton = createStyledButton("Go", ACCENT_COLOR);
 
@@ -482,7 +508,7 @@ public class Main {
 
         JPanel changeButtonsPanel = new JPanel(new GridLayout(2, 4, 5, 5));
         changeButtonsPanel.setBackground(Color.WHITE);
-        String[] denominations = {"$0.01", "$0.05", "$0.25", "$0.5", "$1", "$5", "$10", "$20","$50","$100"};
+        String[] denominations = {"$0.01", "$0.05", "$0.25", "$0.5", "$1", "$5", "$10", "$20", "$50", "$100"};
         for (String denom : denominations) {
             JButton btn = createStyledButton(denom, ACCENT_COLOR);
             btn.addActionListener(e -> returnChange(denom));
@@ -558,14 +584,39 @@ class Items {
         this.code = code;
     }
 
-    public String getName() { return name; }
-    public int getPrice() { return price; }
-    public int getCategory() { return category; }
-    public int getQuantity() { return quantity; }
-    public String getCode() { return code; }
+    public String getName() {
+        return name;
+    }
 
-    public void setName(String name) { this.name = name; }
-    public void setPrice(int price) { this.price = price; }
-    public void setCategory(int category) { this.category = category; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public int getPrice() {
+        return price;
+    }
+
+    public int getCategory() {
+        return category;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }
