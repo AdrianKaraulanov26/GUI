@@ -87,12 +87,12 @@ public class Main {
     private static JTextField createAdminField(String labelText, int x, int y) {
         JLabel label = new JLabel(labelText);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        label.setBounds(x, y, 200, 25);
+        label.setBounds(x, y, 250, 25);
         adminPanel.add(label);
 
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        field.setBounds(x + 210, y, 200, 25);
+        field.setBounds(x + 260, y, 200, 25);
         adminPanel.add(field);
 
         return field;
@@ -615,7 +615,7 @@ public class Main {
         registerEmployeeName = createAdminField("Enter new customer name:",20,yPos);
         yPos += 50;
         registerEmployeeBaseSalary = createAdminField("Enter new customer base-salary:",20,yPos);
-        yPos += 50;
+        yPos +=50;
         JButton registerCustomerButton = createStyledButton("Register Customer", SUCCESS_COLOR);
         registerCustomerButton.setBounds(240, yPos, 200, 40);
         registerCustomerButton.addActionListener(e -> {
@@ -625,16 +625,16 @@ public class Main {
             if (!customerID.isEmpty() && !customerName.isEmpty()) {
                 customers.add(new Customer(customerID, customerName));
                 saveCustomersToFile(customers);
-                
+
                 registerCustomerID.setText("");
                 registerCustomerName.setText("");
             }
         });
-        
+
         adminPanel.add(registerCustomerButton);
-        yPos += 50;
+
         JButton registerEmployeeButton = createStyledButton("Register Employee", SUCCESS_COLOR);
-        registerEmployeeButton.setBounds(440, yPos, 200, 40);
+        registerEmployeeButton.setBounds(460, yPos, 200, 40);
         registerEmployeeButton.addActionListener(e -> {
             String employeeID = registerEmployeeID.getText();
             String employeeName = registerEmployeeName.getText();
@@ -647,6 +647,7 @@ public class Main {
                 registerEmployeeBaseSalary.setText("");
             }
         });
+        adminPanel.add(registerEmployeeButton);
         JButton saveAndInsertButton = createStyledButton("Add/Save Item", SUCCESS_COLOR);
         saveAndInsertButton.setBounds(20, yPos, 200, 40);
         saveAndInsertButton.addActionListener(e -> {
