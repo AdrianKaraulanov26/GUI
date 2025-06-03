@@ -23,6 +23,7 @@ public class Main {
     public static JTable itemsTable;
     private static ArrayList<Customer> customers = new ArrayList<>();
     private static ArrayList<Employee> employees = new ArrayList<>();
+    private static Customer Currentcustomer;
 
     private static final Color PRIMARY_COLOR = new Color(0, 102, 204);
     private static final Color SECONDARY_COLOR = new Color(240, 240, 240);
@@ -526,6 +527,12 @@ public class Main {
         changeField = createStyledTextField("0", false);
         JLabel enterCustomerId = createBoldLabel("Customer ID:");
         customerIdField = createStyledTextField("ID",true);
+        String currentCustomerID = customerIdField.getText();
+        for(Customer customer : customers){
+            if(customer.getID().equals(currentCustomerID)){
+                Currentcustomer = customer;
+            }
+        }
         totalsPanel.add(totalLabel);
         totalsPanel.add(totalField);
         totalsPanel.add(moneyLabel);
