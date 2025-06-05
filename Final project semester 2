@@ -16,7 +16,7 @@ public class Main {
     public static JTextField totalField;
     public static JPasswordField passwordField;
     public static JPanel adminPanel;
-    public static JTextField itemNameField, itemPriceField, itemCategoryField, itemQuantityField, itemCodeField, customerIdField, registerCustomerID, registerCustomerName, registerEmployeeID, registerEmployeeName, registerEmployeeBaseSalary;
+    public static JTextField itemNameField, itemPriceField, itemCategoryField, itemQuantityField, itemCodeField, customerIdField, registerCustomerID, registerCustomerName, registerEmployeeID, registerEmployeeName, registerEmployeeBaseSalary, employeeIDField;
     public static int currentTotal = 0;
     public static JButton searchButton;
     public static JTextField searchField;
@@ -24,6 +24,7 @@ public class Main {
     private static ArrayList<Customer> customers = new ArrayList<>();
     private static ArrayList<Employee> employees = new ArrayList<>();
     private static Customer Currentcustomer;
+    private static Employee Currentemployee;
 
     private static final Color PRIMARY_COLOR = new Color(0, 102, 204);
     private static final Color SECONDARY_COLOR = new Color(240, 240, 240);
@@ -346,11 +347,14 @@ public class Main {
             fw.write("---------------------" + "\n");
             fw.write("Cash receipt id:" + receiptNumber + "\n");
             fw.write("---------------------" + "\n\n");
-            fw.write("Adrian's Warehouse    " + "\n" + "    495 Birch Street, NY 10014, USA\n");
-            fw.write("Date:      " + thisDate + "\n\n");
+            fw.write("Adrian's Warehouse    " + "\n" + "495 Birch Street, NY 10014, USA\n");
+            fw.write("You were served by: " + Currentemployee.toString() + "\n\n");
+            fw.write("Your purchase points have been stored under the customer: " + Currentcustomer.toString()+ "\n\n");
+            fw.write("Date: " + thisDate + "\n\n");
             fw.write("---------------------" + "\n");
             fw.write("Items Purchased:" + "\n");
             fw.write("---------------------" + "\n");
+
 
             for (int i = 0; i < cartTableModel.getRowCount(); i++) {
                 String name = cartTableModel.getValueAt(i, 0).toString();
@@ -515,7 +519,7 @@ public class Main {
         JScrollPane cartScrollPane = new JScrollPane(cartTable);
         middlePanel.add(cartScrollPane, BorderLayout.CENTER);
 
-        JPanel totalsPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel totalsPanel = new JPanel(new GridLayout(5, 2, 10, 10));
         totalsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         totalsPanel.setBackground(Color.WHITE);
 
@@ -526,13 +530,32 @@ public class Main {
         JLabel changeLabel = createBoldLabel("Change Due:");
         changeField = createStyledTextField("0", false);
         JLabel enterCustomerId = createBoldLabel("Customer ID:");
+        JPanel panelCust = new JPanel(new GridLayout(1, 2, 10, 10));
         customerIdField = createStyledTextField("ID",true);
-        String currentCustomerID = customerIdField.getText();
-        for(Customer customer : customers){
-            if(customer.getID().equals(currentCustomerID)){
-                Currentcustomer = customer;
+        JButton saveCurentCust = createStyledButton("Add",SUCCESS_COLOR);
+        saveCurentCust.addActionListener(e ->{
+//            System.out.println("BANIZAAAAAA");
+            String currentCustomerID = customerIdField.getText();
+            for(Customer customer : customers){
+                if(customer.getID().equals(currentCustomerID)){
+                    Currentcustomer = customer;
+                    System.out.println(Currentcustomer.toString());
+                }
             }
-        }
+        });
+        JLabel addEmployeeID = createBoldLabel("EmployeeID:");
+        JPanel panelEmp = new JPanel(new GridLayout(1,2,10,10));
+        employeeIDField = createStyledTextField("ID", true);
+        JButton saveCurentEmp = createStyledButton("Add",SUCCESS_COLOR);
+        saveCurentEmp.addActionListener(e ->{
+            System.out.println("MAZNAAAA");
+            String currentEmployeeID = employeeIDField.getText();
+            for(Employee emp : employees){
+                if(emp.getEmployeeID().equals(currentEmployeeID)){
+                    Currentemployee = emp;
+                }
+            }
+        });
         totalsPanel.add(totalLabel);
         totalsPanel.add(totalField);
         totalsPanel.add(moneyLabel);
@@ -540,7 +563,13 @@ public class Main {
         totalsPanel.add(changeLabel);
         totalsPanel.add(changeField);
         totalsPanel.add(enterCustomerId);
-        totalsPanel.add(customerIdField);
+        panelCust.add(customerIdField);
+        panelCust.add(saveCurentCust);
+        totalsPanel.add(panelCust);
+        totalsPanel.add(addEmployeeID);
+        panelEmp.add(employeeIDField);
+        panelEmp.add(saveCurentEmp);
+        totalsPanel.add(panelEmp);
         middlePanel.add(totalsPanel, BorderLayout.NORTH);
 
         JPanel buttonsPanel = new JPanel(new GridLayout(3, 1, 10, 10));
@@ -555,11 +584,13 @@ public class Main {
         roundPanel.setBackground(Color.WHITE);
         JButton round50Button = createStyledButton("Complete Purchase", PRIMARY_COLOR);
         round50Button.addActionListener(e -> {
-            if (cartTableModel.getRowCount() > 0) {
+            if (cartTableModel.getRowCount() > 0 && !customerIdField.getText().equals("ID") && !employeeIDField.getText().equals("ID")) {
                 printReceipt();
                 clearPurchases();
+                Currentcustomer.addPurchase(Double.parseDouble(totalLabel.getText()));
+                System.out.println(Currentcustomer.toString());
             } else {
-                JOptionPane.showMessageDialog(frame, "Cart is empty!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Something seems fishy my guy", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -617,11 +648,11 @@ public class Main {
         yPos += 50;
         registerCustomerName = createAdminField("Enter new customer name:",20,yPos);
         yPos += 50;
-        registerEmployeeID = createAdminField("Enter new customer ID:",20,yPos);
+        registerEmployeeID = createAdminField("Enter new employee ID:",20,yPos);
         yPos += 50;
-        registerEmployeeName = createAdminField("Enter new customer name:",20,yPos);
+        registerEmployeeName = createAdminField("Enter new employee name:",20,yPos);
         yPos += 50;
-        registerEmployeeBaseSalary = createAdminField("Enter new customer base-salary:",20,yPos);
+        registerEmployeeBaseSalary = createAdminField("Enter new employee base-salary:",20,yPos);
         yPos +=50;
         JButton registerCustomerButton = createStyledButton("Register Customer", SUCCESS_COLOR);
         registerCustomerButton.setBounds(240, yPos, 200, 40);
@@ -642,6 +673,7 @@ public class Main {
 
         JButton registerEmployeeButton = createStyledButton("Register Employee", SUCCESS_COLOR);
         registerEmployeeButton.setBounds(460, yPos, 200, 40);
+
         registerEmployeeButton.addActionListener(e -> {
             String employeeID = registerEmployeeID.getText();
             String employeeName = registerEmployeeName.getText();
@@ -725,7 +757,6 @@ class Items {
 }
 
 class Employee implements Serializable {
-    private static final long serialVersionUID = 1L;
     private String name;
     private double baseSalary;
     private int sales;
@@ -771,13 +802,11 @@ class Employee implements Serializable {
     }
 
     public String toString() {
-        return String.format("Employee[ID=%s, Name=%s, Sales=$%d, Salary=$%.2f]",
-                employeeID, name, sales, getTotalSalary());
+        return "ID:" + this.getEmployeeID() + " | Name: " + this.getName();
     }
 }
 
 class Customer implements Serializable {
-    private static final long serialVersionUID = 1L;
     private String ID;
     private String name;
     private double purchases;
@@ -824,7 +853,6 @@ class Customer implements Serializable {
     }
 
     public String toString() {
-        return String.format("Customer[ID=%s, Name=%s, TotalPurchases=$%.2f, RewardPoints=%d]",
-                ID, name, purchases, rewardPoints);
+        return "ID: " + this.getID() + " | Under the name of: "+ this.getName() + " | With total reward points: " + this.getRewardPoints();
     }
 }
