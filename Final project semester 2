@@ -7,6 +7,8 @@ import javax.swing.border.*;
 import javax.swing.table.*;
 
 public class Main {
+    //HAHHAHHAHAAAA, TIME TO WRITE COMMENTSSSSSSSSSSSSSSSSsss
+    //Well first we have a lot of static variables, so I can access and set them in methods.
     public static JFrame frame;
     public static ArrayList<Items> items = new ArrayList<>();
     public static DefaultTableModel itemsTableModel;
@@ -26,13 +28,14 @@ public class Main {
     private static Customer Currentcustomer;
     private static Employee Currentemployee;
     private static Employee reportEmp;
-
+    // Um.... colors :)
     private static final Color PRIMARY_COLOR = new Color(0, 102, 204);
     private static final Color SECONDARY_COLOR = new Color(240, 240, 240);
     private static final Color ACCENT_COLOR = new Color(255, 153, 0);
     private static final Color SUCCESS_COLOR = new Color(0, 153, 51);
 
     private static JPanel createPanel(String title) {
+        //method for creating a panel, not the most exciting thing
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new CompoundBorder(
                 new TitledBorder(title),
@@ -43,6 +46,7 @@ public class Main {
     }
 
     private static JTable createStyledTable(DefaultTableModel model) {
+        //once again not the most exciting thing, but it's necessary
         JTable table = new JTable(model);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.setRowHeight(25);
@@ -59,6 +63,7 @@ public class Main {
     }
 
     private static JButton createStyledButton(String text, Color bgColor) {
+        //another helper
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setBackground(bgColor);
@@ -70,6 +75,7 @@ public class Main {
     }
 
     private static JLabel createBoldLabel(String text) {
+        // you guessed it, a helper
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.BOLD, 14));
         label.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -77,6 +83,7 @@ public class Main {
     }
 
     private static JTextField createStyledTextField(String text, boolean editable) {
+        // this one was cool since I learned that you can make fields uneditable to prevent manipulation of prices
         JTextField field = new JTextField(text);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         field.setEditable(editable);
@@ -88,6 +95,7 @@ public class Main {
     }
 
     private static JTextField createAdminField(String labelText, int x, int y) {
+        // helper methods yipeee
         JLabel label = new JLabel(labelText);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         label.setBounds(x, y, 250, 25);
@@ -102,6 +110,7 @@ public class Main {
     }
 
     private static void sortItems() {
+        // this is a new sorting algorithm for me
         Collections.sort(items, (item1, item2) -> {
             int codeCompare = item1.getCode().compareTo(item2.getCode());
             if (codeCompare != 0) return codeCompare;
@@ -110,11 +119,13 @@ public class Main {
     }
 
     public static void updateItemsTable(String searchTerm) {
+        //first we load the item arrays after deleting the previous details
         itemsTableModel.setRowCount(0);
         ArrayList<Items> matchedItems = new ArrayList<>();
         ArrayList<Items> otherItems = new ArrayList<>();
-
+        //loading the items into the table
         if (searchTerm != null && !searchTerm.isEmpty()) {
+            //searching and adding items based on searchTerm
             for (Items item : items) {
                 if (item.getCode().toLowerCase().contains(searchTerm.toLowerCase()) ||
                         item.getName().toLowerCase().contains(searchTerm.toLowerCase())) {
@@ -126,7 +137,7 @@ public class Main {
         } else {
             otherItems.addAll(items);
         }
-
+        //formating the items into the table formated as dollars
         for (Items item : matchedItems) {
             itemsTableModel.addRow(new Object[]{
                     item.getCode(),
@@ -136,7 +147,7 @@ public class Main {
                     item.getQuantity()
             });
         }
-
+    // then adding any unmatched items
         for (Items item : otherItems) {
             itemsTableModel.addRow(new Object[]{
                     item.getCode(),
@@ -150,6 +161,7 @@ public class Main {
 
     public static void addOrUpdateItem() {
         try {
+            //creating new item objects based on the given new data and adding it to the table
             String code = itemCodeField.getText();
             String name = itemNameField.getText();
             int price = (int) (Double.parseDouble(itemPriceField.getText()) * 100);
@@ -181,6 +193,7 @@ public class Main {
     }
 
     public static void loadItemsFromFile() {
+        //reader method for loading items
         items.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader("items.txt"))) {
             String line;
@@ -199,6 +212,7 @@ public class Main {
             sortItems();
             updateItemsTable(null);
         } catch (FileNotFoundException e) {
+            //adding new default items if no items exist
             items.add(new Items("Apple", 100, 1, 10, "A001"));
             items.add(new Items("Banana", 50, 1, 15, "A002"));
             items.add(new Items("Milk", 200, 2, 5, "B001"));
@@ -214,23 +228,26 @@ public class Main {
     }
 
     public static void addToCart(int selectedRow) {
+        // selecting an item to be added ( if the row is valid of course )
         if (selectedRow >= 0 && selectedRow < itemsTableModel.getRowCount()) {
             String itemCode = (String) itemsTableModel.getValueAt(selectedRow, 0);
             Items item = null;
-
+            //finding the item's object
             for (Items i : items) {
                 if (i.getCode().equals(itemCode)) {
                     item = i;
                     break;
                 }
             }
-
-            if (item != null) {
+            // handkling empty object case and deleting it afterwards + appology message
+            if (item != null) { //first we see if there is one such item
                 if (item.getQuantity() <= 0) {
                     JOptionPane.showMessageDialog(frame, "Item out of stock!", "Error", JOptionPane.ERROR_MESSAGE);
+                    items.remove(item);
+                    JOptionPane.showMessageDialog(frame, "Sorry, we have fixed our supply error!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
+                //increasing the count if the item already exists in cart, then update stats as necessarily
                 for (int i = 0; i < cartTableModel.getRowCount(); i++) {
                     if (cartTableModel.getValueAt(i, 0).equals(item.getName())) {
                         int qty = (int) cartTableModel.getValueAt(i, 2) + 1;
@@ -246,14 +263,14 @@ public class Main {
                         return;
                     }
                 }
-
+            // add an item to the cart if it is unique compared to the rest
                 cartTableModel.addRow(new Object[]{
                         item.getName(),
                         "$" + (item.getPrice() / 100.0),
                         1,
                         "$" + (item.getPrice() / 100.0)
                 });
-
+            //updating stats
                 item.setQuantity(item.getQuantity() - 1);
                 saveItemsToFile();
                 updateItemsTable(searchField.getText());
@@ -263,67 +280,73 @@ public class Main {
     }
 
     public static void updateTotal() {
+        //updating the field for the price
         currentTotal = 0;
         for (int i = 0; i < cartTableModel.getRowCount(); i++) {
             String totalStr = cartTableModel.getValueAt(i, 3).toString().substring(1);
             currentTotal += (int) (Double.parseDouble(totalStr) * 100);
         }
         totalField.setText(String.format("$%.2f", currentTotal / 100.0));
+        // I hate string formats, but I like plagirising from https://www.w3schools.com/java/ref_string_format.asp
     }
 
     public static void calculateChange() {
+
         try {
+            //getting the payed amount as a string without the $ then parsing it as a double and updating the info based on the given and total
             String moneyStr = moneyField.getText().replace("$", "");
             double given = Double.parseDouble(moneyStr) * 100;
             double change = given - currentTotal;
+            //checking for shenanigans
             if (change < 0) {
                 changeField.setText("$0.00");
-                JOptionPane.showMessageDialog(frame,
-                        "Insufficient payment!",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Insufficient payment!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 changeField.setText(String.format("$%.2f", change / 100.0));
             }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(frame,
-                    "Please enter a valid amount",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Please enter a valid amount", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static void returnChange(String denomination) {
+        //same thing with the upper method
         try {
             String changeStr = changeField.getText().replace("$", "");
             double change = Double.parseDouble(changeStr) * 100;
             if (change <= 0) {
                 return;
             }
-
+            //implementing logic for multiple change pieces, because employees can be stupid but computers can't
             double denomValue = Double.parseDouble(denomination.substring(1)) * 100;
             if (change >= denomValue) {
                 int count = (int) (change / denomValue);
+                //getting the max number
                 change = change % denomValue;
                 changeField.setText(String.format("$%.2f", change / 100.0));
-                JOptionPane.showMessageDialog(frame,
-                        "Give " + count + " of " + denomination,
-                        "Change", JOptionPane.INFORMATION_MESSAGE);
+                //displaying the return
+                JOptionPane.showMessageDialog(frame, "Give " + count + " of " + denomination, "Change", JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (NumberFormatException e) {
         }
     }
 
     public static void toggleAdminPanel() {
+        //really fun thing I learned because of the project, locked fields are cool af
         String password = new String(passwordField.getPassword());
         if ("porcusini cocosini".equals(password)) {
+            //setting the panels visible can make a fun game if you ask me
             adminPanel.setVisible(!adminPanel.isVisible());
             passwordField.setText("");
             frame.revalidate();
+            //have to implement a closing feature but I am currently writing documentation and I am lazy
         } else {
             JOptionPane.showMessageDialog(frame, "Incorrect password!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static void clearAdminFields() {
+        //ok this one is intuitive, but only works for items, I need to update my code to be more readable as below it gets a bit spagetti like, but I got excited, sorry
         itemCodeField.setText("");
         itemNameField.setText("");
         itemPriceField.setText("");
@@ -332,6 +355,7 @@ public class Main {
     }
 
     public static void clearPurchases() {
+        //intuitivee
         cartTableModel.setRowCount(0);
         moneyField.setText("");
         changeField.setText("");
@@ -340,6 +364,7 @@ public class Main {
     }
 
     public static void printReceipt() {
+        //tis one doesn't have anything exciting except for a num generator, and some writer instatiations which can be done smarter, but I had fun
         int receiptNumber = (int) Math.floor(Math.random() * 99999);
         LocalDateTime thisDate = LocalDateTime.now();
         String path = "/home/akaraulanov26/GitHub/" + receiptNumber + Currentcustomer.getName()+  ".txt";
@@ -363,8 +388,8 @@ public class Main {
                 String quantity = cartTableModel.getValueAt(i, 2).toString();
                 String total = cartTableModel.getValueAt(i, 3).toString();
 
-                fw.write(String.format("%-20s %8s %3s %10s%n",
-                        name, price, "x" + quantity, total));
+                fw.write(String.format("%-20s %8s %3s %10s%n", name, price, "x" + quantity, total));
+                // God bless people who write documentation for java + I could have done this much easier in the item method as an item display method, but well, I was dumb...
             }
 
             fw.write("\n---------------------" + "\n");
@@ -379,6 +404,7 @@ public class Main {
     }
 
     public static void printEmployeeMonthlyReport(Employee reportEmployee) {
+        //nothing to explain except for the fact I USED AI HERE!!, (didn't want to write the special congradulations by hand)
         LocalDateTime thisDate = LocalDateTime.now();
         String path = "/home/akaraulanov26/GitHub/" + reportEmployee.getName() + "MonthlyReport" + ".txt";
 
@@ -388,7 +414,9 @@ public class Main {
             fw.write("----------------------" + "\n\n\n\n");
             fw.write("Name: " + reportEmployee.getName() + "\n");
             if (reportEmployee.getSales() <= 50000) {
-                fw.write("Deer " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Date" + thisDate + "\n\n\n");
+                fw.write("Dear " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Your performance this month indicates your sales number is: " + reportEmployee.getSales()+"\n");
                 fw.write("Your sales performance this month has met the baseline expectations." + "\n");
                 fw.write("You have demonstrated a steady and consistent effort in your role." + "\n");
                 fw.write("While there is room for improvement, your current output is satisfactory." + "\n");
@@ -397,13 +425,15 @@ public class Main {
                 fw.write("Consider setting new personal goals for next month." + "\n");
                 fw.write("Your reliability is valued and appreciated by the management team." + "\n");
                 fw.write("Let’s aim for even better results moving forward." + "\n");
-                fw.write("For more information feel free to contact me :)" + "\n");
+                fw.write("For more information feel free to contact me :)" + "\n\n");
                 fw.write("-------------------------------------------" + "\n\n");
                 fw.write("Adrian Karaulanov, Store Owner" + "\n\n");
                 fw.write("-------------------------------------------" + "\n");
 
             } else if (reportEmployee.getSales() <= 65000) {
-                fw.write("Deer " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Date" + thisDate + "\n\n\n");
+                fw.write("Dear " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Your performance this month indicates your sales number is: " + reportEmployee.getSales()+"\n");
                 fw.write("Excellent work this month—your sales numbers have exceeded expectations." + "\n");
                 fw.write("You’ve shown a strong commitment to performance and results." + "\n");
                 fw.write("Your productivity stands out among your peers." + "\n");
@@ -412,12 +442,14 @@ public class Main {
                 fw.write("Keep up the great work and continue setting a high standard." + "\n");
                 fw.write("We appreciate your efforts and look forward to more success stories from you." + "\n");
                 fw.write("Thank you for your valuable contribution this month." + "\n");
-                fw.write("For more information feel free to contact me :)" + "\n");
+                fw.write("For more information feel free to contact me :)" + "\n\n");
                 fw.write("-------------------------------------------" + "\n\n");
                 fw.write("Adrian Karaulanov, Store Owner" + "\n\n");
                 fw.write("-------------------------------------------" + "\n");
             } else if (reportEmployee.getSales() <= 90000) {
-                fw.write("Deer " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Date" + thisDate + "\n\n\n");
+                fw.write("Dear " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Your performance this month indicates your sales number is: " + reportEmployee.getSales()+"\n");
                 fw.write("You have consistently ranked among the top performers this month." + "\n");
                 fw.write("Your outstanding sales numbers reflect a high level of professionalism and drive." + "\n");
                 fw.write("Management has taken note of your consistency and impact on overall team performance." + "\n");
@@ -426,12 +458,14 @@ public class Main {
                 fw.write("This acknowledgment comes not only from metrics but also from observed initiative and responsibility." + "\n");
                 fw.write("Keep striving for excellence—you are on a path toward long-term success." + "\n");
                 fw.write("Your future with the company looks bright." + "\n");
-                fw.write("For more information feel free to contact me :)" + "\n");
+                fw.write("For more information feel free to contact me :)" + "\n\n");
                 fw.write("-------------------------------------------" + "\n\n");
                 fw.write("Adrian Karaulanov, Store Owner" + "\n\n");
                 fw.write("-------------------------------------------" + "\n");
             } else {
-                fw.write("Deer " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Date" + thisDate + "\n\n\n");
+                fw.write("Dear " + reportEmployee.getName() + ", " + "\n");
+                fw.write("Your performance this month indicates your sales number is: " + reportEmployee.getSales()+"\n");
                 fw.write("Congratulations on being named Employee of the Month!" + "\n");
                 fw.write("Your unmatched sales performance has set a new benchmark for excellence." + "\n");
                 fw.write("The energy and results you've brought this month are truly exceptional." + "\n");
@@ -440,15 +474,11 @@ public class Main {
                 fw.write("Your efforts have significantly contributed to the company’s goals." + "\n");
                 fw.write("Management is proud to have someone of your caliber on the team." + "\n");
                 fw.write("Keep up this phenomenal work—you are a model of excellence." + "\n");
-                fw.write("For more information feel free to contact me :)" + "\n");
+                fw.write("For more information feel free to contact me :)" + "\n\n");
                 fw.write("-------------------------------------------" + "\n\n");
                 fw.write("Adrian Karaulanov, Store Owner" + "\n\n");
                 fw.write("-------------------------------------------" + "\n");
             }
-
-
-
-
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, "Error printing receipt: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -456,11 +486,11 @@ public class Main {
     }
 
     public static void saveItemsToFile() {
+
         try (PrintWriter writer = new PrintWriter(new FileWriter("items.txt"))) {
             for (Items item : items) {
-                writer.println(item.getCode() + "," + item.getName() + "," +
-                        item.getPrice() + "," + item.getCategory() + "," +
-                        item.getQuantity());
+                writer.println(item.getCode() + "," + item.getName() + "," + item.getPrice() + "," + item.getCategory() + "," + item.getQuantity());
+                //again should have done that in the item method, but I prefer not to jump too much in my code because I get lost ;/
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, "Error saving items: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -468,35 +498,36 @@ public class Main {
     }
 
     public static void saveCustomersToFile(ArrayList<Customer> customers) {
+        // a simple oos
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("customers.dat"))) {
             oos.writeObject(customers);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Error saving customers: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Error saving customers: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static ArrayList<Customer> loadCustomersFromFile() {
+        //not so simple since I had to add filters as to not blow stuff up.
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("customers.dat"))) {
             return (ArrayList<Customer>) ois.readObject();
         } catch (FileNotFoundException e) {
+            //new list in the case of no file info
             Customer joe1 = new Customer("0","John Doe");
             ArrayList<Customer> customers = new ArrayList<>();
             customers.add(joe1);
             return customers;
         } catch (IOException | ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(frame, "Error loading customers: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Error loading customers: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return new ArrayList<>();
         }
     }
 
     public static void saveEmployeesToFile(ArrayList<Employee> employees) {
+        //same as above, literally I copied my code twice and changed names and vars
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("employees.dat"))) {
             oos.writeObject(employees);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Error saving employees: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Error saving employees: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -509,25 +540,25 @@ public class Main {
             employees.add(joe1);
             return employees;
         } catch (IOException | ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(frame, "Error loading employees: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Error loading employees: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return new ArrayList<>();
         }
     }
 
     public static void main(String[] args) {
+        //oh boy here the spagetty code gets real, because I just did the UI randomly, sorry for your eyes
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        // frame stuff
         frame = new JFrame("Cash Register System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(2400, 1600);
         frame.setLayout(new BorderLayout(10, 10));
         frame.getContentPane().setBackground(SECONDARY_COLOR);
-
+        //initializing panels
         JPanel mainPanel = new JPanel(new BorderLayout(20, 20));
         mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(SECONDARY_COLOR);
@@ -548,18 +579,19 @@ public class Main {
         JPanel leftPanel = createPanel("Available Items");
         String[] itemColumns = {"Code", "Name", "Price", "Category", "Quantity"};
         itemsTableModel = new DefaultTableModel(itemColumns, 0) {
-            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
+                // preventing shenanigans
             }
         };
+        //making the left table
         itemsTable = createStyledTable(itemsTableModel);
         updateItemsTable(null);
 
         JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
         itemsScrollPane.setPreferredSize(new Dimension(400, 600));
         leftPanel.add(itemsScrollPane, BorderLayout.CENTER);
-
+        //buttons
         JButton addToCartButton = createStyledButton("Add to Cart", ACCENT_COLOR);
         addToCartButton.addActionListener(e -> addToCart(itemsTable.getSelectedRow()));
 
@@ -576,7 +608,7 @@ public class Main {
                 itemsTable.scrollRectToVisible(itemsTable.getCellRect(0, 0, true));
             }
         });
-
+        // more UI, YIPEEE
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
         leftPanel.add(searchPanel, BorderLayout.SOUTH);
@@ -588,7 +620,6 @@ public class Main {
 
         String[] cartColumns = {"Item", "Price", "Quantity", "Total"};
         cartTableModel = new DefaultTableModel(cartColumns, 0) {
-            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -600,7 +631,7 @@ public class Main {
         JPanel totalsPanel = new JPanel(new GridLayout(5, 2, 10, 10));
         totalsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         totalsPanel.setBackground(Color.WHITE);
-
+        //I love spagetti, I constantly loose myself, yet alone side programers
         JLabel totalLabel = createBoldLabel("Total:");
         totalField = createStyledTextField("0", false);
         JLabel moneyLabel = createBoldLabel("Amount Given:");
@@ -612,7 +643,7 @@ public class Main {
         customerIdField = createStyledTextField("ID",true);
         JButton saveCurentCust = createStyledButton("Add",SUCCESS_COLOR);
         saveCurentCust.addActionListener(e ->{
-//            System.out.println("BANIZAAAAAA");
+//            System.out.println("BANIZAAAAAA"); This one you know about, saved a lot of tears
             String currentCustomerID = customerIdField.getText();
             customerIdField.setText("ID");
             for(Customer customer : customers){
@@ -622,6 +653,7 @@ public class Main {
                 }
             }
         });
+        // more spagetti UI
         JLabel addEmployeeID = createBoldLabel("EmployeeID:");
         JPanel panelEmp = new JPanel(new GridLayout(1,2,10,10));
         employeeIDField = createStyledTextField("ID", true);
@@ -636,6 +668,7 @@ public class Main {
                 }
             }
         });
+        // pretty sure this could have been optimised but well I am lazy, sorry again. :)
         totalsPanel.add(totalLabel);
         totalsPanel.add(totalField);
         totalsPanel.add(moneyLabel);
@@ -651,7 +684,7 @@ public class Main {
         panelEmp.add(saveCurentEmp);
         totalsPanel.add(panelEmp);
         middlePanel.add(totalsPanel, BorderLayout.NORTH);
-
+        // styling and paneling
         JPanel buttonsPanel = new JPanel(new GridLayout(3, 1, 10, 10));
         buttonsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         buttonsPanel.setBackground(Color.WHITE);
@@ -676,7 +709,7 @@ public class Main {
 
         roundPanel.add(round50Button);
         buttonsPanel.add(roundPanel);
-
+        // still UI :)
         JPanel changeButtonsPanel = new JPanel(new GridLayout(2, 4, 5, 5));
         changeButtonsPanel.setBackground(Color.WHITE);
         String[] denominations = {"$0.01", "$0.05", "$0.25", "$0.5", "$1", "$5", "$10", "$20", "$50", "$100"};
@@ -712,7 +745,7 @@ public class Main {
         );
         adminPanel.setBackground(Color.WHITE);
         adminPanel.setVisible(false);
-
+        // welp I could have optimised stuff inteligently, but here go extra 10 lines :)
         int yPos = 30;
         itemCodeField = createAdminField("Item Code:", 20, yPos);
         yPos += 50;
@@ -756,7 +789,7 @@ public class Main {
 
         JButton registerEmployeeButton = createStyledButton("Register Employee", SUCCESS_COLOR);
         registerEmployeeButton.setBounds(460, yPos, 200, 40);
-
+        // just buttons, not so fun stuff, but I had to not f- things up
         registerEmployeeButton.addActionListener(e -> {
             String employeeID = registerEmployeeID.getText();
             String employeeName = registerEmployeeName.getText();
@@ -772,17 +805,18 @@ public class Main {
         JButton printEmployeeReport1 = createStyledButton("Print Employee Details",SUCCESS_COLOR);
         printEmployeeReport1.setBounds(20, yPos+50, 200, 40);
         printEmployeeReport1.addActionListener(e ->{
-            System.out.println("Tedolini Domatini");
+//            System.out.println("Tedolini Domatini"); ignore
             for(Employee employee: employees){
-                System.out.println("IDK, work");
+//                System.out.println("IDK, work"); seriously ignore
                 if(employee.getEmployeeID().equals(printEmployeeReport.getText())){
                     reportEmp = employee;
-                    System.out.println("Hi nick");
+//                    System.out.println("Hi nick"); don't even ask who nick is :(
                 }
             }
             printEmployeeReport.setText("");
             printEmployeeMonthlyReport(reportEmp);
         });
+        //almost done with UI, next time I promise to add some inteligence and split it into methods
         adminPanel.add(printEmployeeReport1);
         adminPanel.add(registerEmployeeButton);
         JButton saveAndInsertButton = createStyledButton("Add/Save Item", SUCCESS_COLOR);
@@ -803,6 +837,7 @@ public class Main {
 }
 
 class Items {
+    // absolutelly nothing exciting, just custom boxes cor strings and ints
     private String name;
     private int price;
     private int category;
@@ -855,6 +890,7 @@ class Items {
 }
 
 class Employee implements Serializable {
+    // absolutelly nothing exciting, just custom boxes cor strings and ints
     private String name;
     private double baseSalary;
     private int sales;
@@ -905,6 +941,7 @@ class Employee implements Serializable {
 }
 
 class Customer implements Serializable {
+    // absolutelly nothing exciting, just custom boxes cor strings and ints
     private String ID;
     private String name;
     private double purchases;
@@ -926,6 +963,7 @@ class Customer implements Serializable {
     }
 
     public double getPurchases() {
+        // I should have added some more exciting stuff, but I forgot, so pretend as if you don't see it
         return purchases;
     }
 
@@ -954,3 +992,9 @@ class Customer implements Serializable {
         return "ID: " + this.getID() + " | Under the name of: "+ this.getName() + " | With total reward points: " + this.getRewardPoints();
     }
 }
+
+
+
+
+
+// I just want 1000 lines :), (shortened like 25 in the documentation and comentation
